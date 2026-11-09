@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPI IT Department Internal Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <!-- Tailwind CSS CDN for fast, clean styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Dashboard Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between hidden md:flex border-r border-slate-800">
+        <div>
+            <!-- Brand / Logo Header -->
+             <div class="p-5 border-b border-slate-800 flex flex-col items-center text-center space-y-2">
+            <img src="logo.png" alt="Fabricator Philippines Incorporated" class="h-8 w-auto object-contain">
+            <p class="text-xs text-slate-400">Batino Branch | IT Portal</p>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1 text-sm">
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hardware_assets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-laptop w-5"></i>
+                    <span>Hardware Assets</span>
+                </a>
+                <a href="access_audit_logs.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-file-shield w-5"></i>
+                    <span>Access Audit Tracker</span>
+                </a>
+                <a href="asset_borrowing.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-handshake-angle w-5"></i>
+                    <span>Asset Borrowing</span>
+                </a>
+                <a href="it_support_tickets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-ticket w-5"></i>
+                    <span>IT Support Tickets</span>
+                </a>
+                <a href="storage.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-database w-5"></i>
+                    <span>Backup & Storage</span>
+                </a>
+                <a href="provisioning_roster.html" id="roster-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-users-gear w-5"></i>
+                    <span>Provisioning Roster (Admin)</span>
+                </a>
+                <a href="user_management.html" id="usermgmt-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-user-gear w-5"></i>
+                    <span>User Management (Admin)</span>
+                </a>
+                </nav>
+        </div>
+
+        <!-- Sidebar Footer / User Info (Lower-Left) -->
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <div>
+                <p id="sidebar-username" class="font-semibold text-slate-200">Loading...</p>
+                <p class="text-emerald-400">● Secure System Online</p>
+            </div>
+            <i class="fa-solid fa-shield-halved text-blue-500 text-lg"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- TOP HEADER BAR -->
+        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <span class="text-slate-500 text-sm">IT Portal</span>
+                <span class="text-slate-300">/</span>
+                <h2 class="text-slate-800 font-bold text-lg">Dashboard Overview</h2>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Search assets, logs, tickets..." class="bg-slate-100 text-xs px-4 py-2 rounded-full w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Top-Right User Profile with Hover Dropdown Menu -->
+                <div class="relative group border-l pl-4 border-slate-200 cursor-pointer">
+                    <!-- Trigger Element -->
+                    <div class="flex items-center space-x-2 py-2">
+                        <div id="header-user-initials" class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">--</div>
+                        <span id="header-user-name" class="text-sm font-medium text-slate-700">Loading...</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
+                    </div>
+
+                    <!-- Dropdown Menu (Appears on Hover) -->
+                    <div class="absolute right-0 w-48 bg-white border border-slate-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-50">
+                        <a href="change_password.html" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 transition">
+                            <i class="fa-solid fa-key mr-2 text-slate-400"></i> Change Password
+                        </a>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <button onclick="logout()" class="w-full text-left block px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 transition">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Log Out
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- DASHBOARD SCROLLABLE CONTENT -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- STATS CARDS ROW -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Card 1: Hardware Assets Dynamic Summary -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Hardware Assets</p>
+                        <h3 id="dash-total-assets" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                        <p class="text-xs text-slate-600 font-medium mt-1">
+                            <span class="text-emerald-600"><span id="dash-operational-count">0</span> Operational</span>, 
+                            <span class="text-amber-600"><span id="dash-repair-count">0</span> in Repair</span>
+                        </p>
+                    </div>
+                    <div class="bg-blue-50 text-blue-600 p-3 rounded-lg text-xl">
+                        <i class="fa-solid fa-desktop"></i>
+                    </div>
+                </div>
+                <!-- Card 2: Assets Borrowed Summary -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Assets Borrowed</p>
+                        <h3 id="dash-borrowed-count" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                        <p class="text-xs text-indigo-600 font-medium mt-1">● Active checked-out items</p>
+                    </div>
+                    <div class="bg-indigo-50 text-indigo-600 p-3 rounded-lg text-xl">
+                        <i class="fa-solid fa-handshake-angle"></i>
+                    </div>
+                </div>
+                <!-- Card 3: Open IT Tickets -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Open IT Tickets</p>
+                        <h3 id="dash-open-tickets-count" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                        <p class="text-xs text-amber-600 font-medium mt-1">⚡ Active support queue</p>
+                    </div>
+                    <div class="bg-amber-50 text-amber-600 p-3 rounded-lg text-xl">
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
+                </div>
+                <!-- Card 4: Access Audit Logs -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Access Audit Logs</p>
+                        <h3 id="dash-audit-count" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                        <p class="text-xs text-blue-600 font-medium mt-1">🛡️ 3-Yr Retention Enforced</p>
+                    </div>
+                    <div class="bg-emerald-50 text-emerald-600 p-3 rounded-lg text-xl">
+                        <i class="fa-solid fa-shield-keyhole"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TWO-COLUMN TABLES ROW -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Recent Access Audit Tracker -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-list-check text-blue-600"></i>
+                            <span>Recent Access Audit Logs</span>
+                        </h3>
+                        <a href="access_audit_logs.html" class="text-xs text-blue-600 hover:underline font-medium">View All</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                                <tr>
+                                    <th class="p-3">Audit ID</th>
+                                    <th class="p-3">Employee Name</th>
+                                    <th class="p-3">System App</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-table-body" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="4" class="p-4 text-center text-slate-400">Loading audit logs...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Asset Borrowing Logs -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-laptop-file text-blue-600"></i>
+                            <span>Asset Borrowing Activity</span>
+                        </h3>
+                        <a href="asset_borrowing.html" class="text-xs text-blue-600 hover:underline font-medium">View All</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                                <tr>
+                                    <th class="p-3">Borrow ID</th>
+                                    <th class="p-3">Borrower</th>
+                                    <th class="p-3">Item</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="borrowing-table-body" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="4" class="p-4 text-center text-slate-400">Loading borrowing records...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- IT SUPPORT TICKETING PANEL -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 lg:col-span-2">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-ticket text-blue-600"></i>
+                            <span>IT Support Ticketing Activity</span>
+                        </h3>
+                        <a href="it_support_tickets.html" class="bg-blue-900 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-800 transition font-medium">Go to Tickets</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                                <tr>
+                                    <th class="p-3">Ticket ID</th>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">Requester</th>
+                                    <th class="p-3">Issue Type</th>
+                                    <th class="p-3">Priority</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tickets-table-body" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="6" class="p-4 text-center text-slate-400">Loading support tickets...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- BACKUP & STORAGE MONITORING ROW -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-server text-blue-600"></i>
+                        <span>Daily Immutable Backup & Storage Status</span>
+                    </h3>
+                    <span class="text-xs text-slate-500">Last Synced: Today, 07:00 AM</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span>ERP Database Backup</span>
+                            <span class="text-emerald-600">Success</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full w-full"></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span>CAD/CAM Repository</span>
+                            <span class="text-emerald-600">Success</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full w-full"></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span>HR & Payroll Database</span>
+                            <span class="text-emerald-600">Success</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full w-full"></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span>Access Log Archives</span>
+                            <span class="text-emerald-600">Secured</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full w-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="auth-sync.js"></script>
+    <!-- JavaScript to Handle Session Data & Dashboard Stats -->
+    <script>
+        // Handle Logout
+        function logout() {
+            localStorage.removeItem('portal_users');
+            localStorage.removeItem('userData');
+            window.location.href = "index.html";
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDashboardStats();
+        });
+
+        // Fetch and populate dashboard summary stats & tables
+        async function loadDashboardStats() {
+            try {
+                // 1. Hardware Assets Stats
+                const assetRes = await fetch('/api/hardware_assets').catch(() => ({ ok: false }));
+                if (assetRes.ok) {
+                    const assetResult = await assetRes.json();
+                    if (assetResult.success) {
+                        const assets = assetResult.data || [];
+                        const totalAssets = assets.length;
+                        
+                        // Count operational and repair status
+                        const operationalCount = assets.filter(a => !a.status || a.status.toLowerCase() === 'operational' || a.status.toLowerCase() === 'active').length;
+                        const repairCount = assets.filter(a => a.status && (a.status.toLowerCase().includes('repair') || a.status.toLowerCase() === 'maintenance')).length;
+
+                        document.getElementById('dash-total-assets').textContent = totalAssets;
+                        document.getElementById('dash-operational-count').textContent = operationalCount;
+                        document.getElementById('dash-repair-count').textContent = repairCount;
+                    }
+                }
+
+                // 2. Asset Borrowing Stats & Table
+                const borrowRes = await fetch('/api/asset_borrowing').catch(() => ({ ok: false }));
+                if (borrowRes.ok) {
+                    const borrowResult = await borrowRes.json();
+                    if (borrowResult.success) {
+                        const records = borrowResult.data || [];
+                        
+                        // Count active borrowed records (where date_returned is null/empty)
+                        const activeBorrowed = records.filter(r => !r.date_returned).length;
+                        document.getElementById('dash-borrowed-count').textContent = activeBorrowed;
+
+                        const borrowTbody = document.getElementById('borrowing-table-body');
+                        if (borrowTbody) {
+                            const topBorrow = records.slice(0, 5);
+                            if (topBorrow.length === 0) {
+                                borrowTbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No borrowing records found.</td></tr>`;
+                            } else {
+                                borrowTbody.innerHTML = topBorrow.map(item => {
+                                    // Combine first, middle, and last names, with fallbacks
+                                    let fullName = '';
+                                    if (item.employee_firstname || item.employee_lastname) {
+                                        const middleInitial = item.employee_middlename ? `${item.employee_middlename.charAt(0)}.` : '';
+                                        fullName = `${item.employee_firstname || ''} ${middleInitial} ${item.employee_lastname || ''}`.trim();
+                                    } else {
+                                        fullName = item.borrower_name || 'N/A';
+                                    }
+
+                                    const logId = item.log_id || item.id || 'N/A';
+                                    const equipmentCategory = item.equipment_category || item.asset_category || item.issue_type || 'N/A';
+
+                                    return `
+                                        <tr>
+                                            <td class="p-3 font-mono font-bold text-blue-600">${logId}</td>
+                                            <td class="p-3 font-semibold text-slate-800">${fullName}</td>
+                                            <td class="p-3 text-slate-600">${equipmentCategory}</td>
+                                            <td class="p-3">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.date_returned ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                                    ${item.date_returned ? 'Returned' : 'Borrowed'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('');
+                            }
+                        }
+                    }
+                }
+
+                // 3. IT Support Tickets Stats & Table
+                const ticketsRes = await fetch('/api/support_tickets').catch(() => ({ ok: false }));
+                if (ticketsRes.ok) {
+                    const ticketsResult = await ticketsRes.json();
+                    if (ticketsResult.success) {
+                        const tickets = ticketsResult.data || [];
+                        const openTickets = tickets.filter(t => t.status && t.status.toLowerCase() !== 'closed' && t.status.toLowerCase() !== 'completed').length;
+                        document.getElementById('dash-open-tickets-count').textContent = openTickets;
+
+                        const ticketsTbody = document.getElementById('tickets-table-body');
+                        if (ticketsTbody) {
+                            const topTickets = tickets.slice(0, 5);
+                            if (topTickets.length === 0) {
+                                ticketsTbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No support tickets found.</td></tr>`;
+                            } else {
+                                ticketsTbody.innerHTML = topTickets.map(item => {
+                                    const fullName = `${item.employee_firstname || ''} ${item.employee_lastname || ''}`.trim();
+                                    return `
+                                        <tr>
+                                            <td class="p-3 font-mono font-bold text-blue-600">${item.ticket_id || `#${item.id}`}</td>
+                                            <td class="p-3 font-mono text-slate-500">${item.date ? item.date.split('T')[0] : 'N/A'}</td>
+                                            <td class="p-3 font-semibold text-slate-800">${fullName || 'N/A'}</td>
+                                            <td class="p-3">${item.issue_type || 'N/A'}</td>
+                                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.priority === 'Urgent' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}">${item.priority || 'Medium'}</span></td>
+                                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">${item.status || 'Open'}</span></td>
+                                        </tr>
+                                    `;
+                                }).join('');
+                            }
+                        }
+                    }
+                }
+
+                // 4. Access Audit Logs Stats & Table
+                const auditRes = await fetch('/api/access_audit_logs').catch(() => ({ ok: false }));
+                if (auditRes.ok) {
+                    const auditResult = await auditRes.json();
+                    if (auditResult.success) {
+                        const logs = auditResult.data || [];
+                        document.getElementById('dash-audit-count').textContent = logs.length;
+
+                        const auditTbody = document.getElementById('audit-table-body');
+                        if (auditTbody) {
+                            const topAudit = logs.slice(0, 5);
+                            if (topAudit.length === 0) {
+                                auditTbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No audit logs found.</td></tr>`;
+                            } else {
+                                auditTbody.innerHTML = topAudit.map(item => {
+                                    // Combine first and last names if they exist separately, or fallback to full name / username fields
+                                    let fullName = item.employee_name || item.name || '';
+                                    if (!fullName && (item.employee_firstname || item.employee_lastname)) {
+                                        fullName = `${item.employee_firstname || ''} ${item.employee_lastname || ''}`.trim();
+                                    }
+                                    if (!fullName) {
+                                        fullName = item.username || item.user_id || 'System User';
+                                    }
+
+                                    // Catch system_application_name first, followed by other fallback variations
+                                    const systemApp = item.system_application_name || item.system_app || item.application || item.module || item.action || 'IT Portal';
+                                    
+                                    const statusVal = item.status || 'Approved';
+                                    const statusBadge = (statusVal.toLowerCase() === 'blocked' || statusVal.toLowerCase() === 'failed') 
+                                        ? 'bg-rose-100 text-rose-700' 
+                                        : 'bg-emerald-100 text-emerald-700';
+
+                                    return `
+                                        <tr>
+                                            <td class="p-3 font-mono font-bold text-blue-600">${item.log_id || item.id || 'N/A'}</td>
+                                            <td class="p-3 font-semibold text-slate-800">${fullName}</td>
+                                            <td class="p-3 text-slate-600">${systemApp}</td>
+                                            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusBadge}">${statusVal}</span></td>
+                                        </tr>
+                                    `;
+                                }).join('');
+                            }
+                        }
+                    }
+                }
+
+            } catch (err) {
+                console.error('Error loading dashboard stats:', err);
+            }
+        }
+    </script>
+</body>
+</html>

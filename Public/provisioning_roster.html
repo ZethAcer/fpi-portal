@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provisioning Roster (Admin) - FPI IT Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between hidden md:flex border-r border-slate-800">
+        <div>
+            <div class="p-5 border-b border-slate-800 flex flex-col items-center text-center space-y-2">
+                <img src="logo.png" alt="Fabricator Philippines Incorporated" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
+                <p class="text-xs text-slate-400">Batino Branch | IT Portal</p>
+            </div>
+            <nav class="p-4 space-y-1 text-sm">
+                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hardware_assets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-laptop w-5"></i>
+                    <span>Hardware Assets</span>
+                </a>
+                <a href="access_audit_logs.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-file-shield w-5"></i>
+                    <span>Access Audit Tracker</span>
+                </a>
+                <a href="asset_borrowing.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-handshake-angle w-5"></i>
+                    <span>Asset Borrowing</span>
+                </a>
+                <a href="it_support_tickets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-ticket w-5"></i>
+                    <span>IT Support Tickets</span>
+                </a>
+                <a href="storage.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-database w-5"></i>
+                    <span>Backup & Storage</span>
+                </a>
+                <a href="provisioning_roster.html" class="flex items-center space-x-3 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium transition">
+                    <i class="fa-solid fa-users-gear w-5"></i>
+                    <span>Provisioning Roster (Admin)</span>
+                </a>
+                <a href="user_management.html" id="usermgmt-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-user-gear w-5"></i>
+                    <span>User Management (Admin)</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <div>
+                <p id="sidebar-username" class="font-semibold text-slate-200">Loading...</p>
+                <p class="text-emerald-400">● Secure System Online</p>
+            </div>
+            <i class="fa-solid fa-shield-halved text-blue-500 text-lg"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <span class="text-slate-500 text-sm">IT Portal</span>
+                <span class="text-slate-300">/</span>
+                <h2 class="text-slate-800 font-bold text-lg">Employee Provisioning Roster</h2>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-2 shadow-sm">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Onboard Employee</span>
+                </button>
+
+                <!-- Top-Right User Profile Dropdown -->
+                <div class="relative group border-l pl-4 border-slate-200 cursor-pointer">
+                    <div class="flex items-center space-x-2 py-2">
+                        <div id="header-user-initials" class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">--</div>
+                        <span id="header-user-name" class="text-sm font-medium text-slate-700">Loading...</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
+                    </div>
+
+                    <div class="absolute right-0 w-48 bg-white border border-slate-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-50">
+                        <a href="change_password.html" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 transition">
+                            <i class="fa-solid fa-key mr-2 text-slate-400"></i> Change Password
+                        </a>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <button onclick="logout()" class="w-full text-left block px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 transition">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTAINER -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+            
+            <!-- SEARCH & CONTROLS -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Search employee name, ID, position..." 
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end text-xs text-slate-500 font-medium">
+                    <div class="flex items-center space-x-2">
+                        <span>Show:</span>
+                        <select id="rows-per-page" onchange="changeRowsPerPage()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 font-semibold">
+                            <option value="10" selected>10 rows</option>
+                            <option value="25">25 rows</option>
+                            <option value="50">50 rows</option>
+                            <option value="100">100 rows</option>
+                        </select>
+                    </div>
+                    <div>
+                        Total Employees: <span id="roster-count" class="font-bold text-slate-800">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3.5">Employee ID</th>
+                                <th class="p-3.5">Full Name</th>
+                                <th class="p-3.5">Department & Job Title</th>
+                                <th class="p-3.5">Manager</th>
+                                <th class="p-3.5">Username</th>
+                                <th class="p-3.5">Effective Date</th>
+                                <th class="p-3.5">Status</th>
+                                <th class="p-3.5 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roster-table-body" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="8" class="p-6 text-center text-slate-400">Loading roster records...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PAGINATION -->
+                <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between text-xs text-slate-600">
+                    <div id="pagination-info">Showing 0 to 0 of 0 entries</div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="prevPage()" id="prev-btn" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+                        </button>
+                        <span id="page-indicator" class="font-bold px-2 text-slate-800">1 / 1</span>
+                        <button onclick="nextPage()" id="next-btn" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            Next <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- ADD / EDIT EMPLOYEE MODAL -->
+    <div id="roster-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden border border-slate-200">
+            <div class="flex justify-between items-center bg-slate-900 text-white px-6 py-4">
+                <h3 id="modal-title" class="font-bold text-sm"><i class="fa-solid fa-user-plus mr-2"></i> Onboard New Employee</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="roster-form" onsubmit="handleSaveEmployee(event)" class="p-6 space-y-4 text-xs max-h-[80vh] overflow-y-auto">
+                <input type="hidden" id="record_id">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Employee ID *</label>
+                        <input type="text" id="employee_id" required placeholder="e.g. FPI-2026-050" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Department *</label>
+                        <input type="text" id="department" required placeholder="e.g. Information Technology" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">First Name *</label>
+                        <input type="text" id="employee_firstname" required placeholder="Juan" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Middle Name</label>
+                        <input type="text" id="employee_middlename" placeholder="Santos" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Last Name *</label>
+                        <input type="text" id="employee_lastname" required placeholder="Dela Cruz" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Job Title *</label>
+                        <input type="text" id="job_title" required placeholder="e.g. System Administrator" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Manager Name</label>
+                        <input type="text" id="manager_name" placeholder="e.g. Brian Lim" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Employee Status *</label>
+                        <select id="employee_status" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-semibold">
+                            <option value="Probationary">Probationary</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Resigned">Resigned</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Effective Date *</label>
+                        <input type="date" id="effective_date" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Portal Role *</label>
+                        <select id="portal_role" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-semibold text-blue-600">
+                            <option value="User">User</option>
+                            <option value="IT">IT</option>
+                            <option value="HR">HR</option>
+                            <option value="IT-Admin">IT-Admin</option>
+                            <option value="HR-Admin">HR-Admin</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Admin Password Confirmation Container (Dynamic for IT-Admin / HR-Admin) -->
+                <div id="admin-auth-container" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
+                    <label class="block font-semibold text-amber-800"><i class="fa-solid fa-lock mr-1"></i> Privileged Role Authorization Required</label>
+                    <p class="text-[11px] text-amber-700">You selected an administrative role (<span id="selected-admin-role-label" class="font-bold"></span>). Please provide authorizing admin credentials:</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="admin_auth_username" placeholder="Admin Username..." class="w-full p-2 bg-white border border-amber-300 rounded-lg">
+                        <input type="password" id="admin_auth_password" placeholder="Admin Password..." class="w-full p-2 bg-white border border-amber-300 rounded-lg">
+                    </div>
+                </div>
+
+                <div id="notice-box" class="p-3 bg-blue-50 border border-blue-100 rounded-lg text-blue-800 space-y-1">
+                    <p class="font-semibold"><i class="fa-solid fa-circle-info mr-1"></i> Account Provisioning Notice:</p>
+                    <p class="text-[11px] text-blue-700">This will save the employee to the roster and automatically provision a portal login account with an auto-generated username and 12-character random secure password.</p>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" id="save-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">Save & Provision Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GLOBAL AUTH SYNC SCRIPT -->
+    <script src="auth-sync.js"></script>
+
+    <!-- CLIENT SCRIPT -->
+    <script>
+        let allRoster = [];
+        let currentRecord = null;
+        let currentPage = 1;
+        let currentUser = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const userData = localStorage.getItem("portal_users");
+            if (userData) {
+                currentUser = JSON.parse(userData);
+            }
+            fetchRosterData();
+
+            // Toggle admin credential prompt visibility based on role selection
+            document.getElementById('portal_role').addEventListener('change', (e) => {
+                const adminBox = document.getElementById('admin-auth-container');
+                const roleLabel = document.getElementById('selected-admin-role-label');
+                const val = e.target.value;
+                if (val === 'IT-Admin' || val === 'HR-Admin') {
+                    roleLabel.textContent = val;
+                    adminBox.classList.remove('hidden');
+                } else {
+                    adminBox.classList.add('hidden');
+                    document.getElementById('admin_auth_username').value = '';
+                    document.getElementById('admin_auth_password').value = '';
+                }
+            });
+        });
+
+        function logout() {
+            localStorage.removeItem('portal_users');
+            localStorage.removeItem('userData');
+            window.location.href = "index.html";
+        }
+
+        async function fetchRosterData() {
+            try {
+                const response = await fetch('/api/provisioning_roster');
+                const result = await response.json();
+
+                if (result.success) {
+                    allRoster = result.data;
+                    updateTable();
+                } else {
+                    document.getElementById('roster-table-body').innerHTML = `<tr><td colspan="8" class="p-6 text-center text-rose-500">Failed to load provisioning roster.</td></tr>`;
+                }
+            } catch (err) {
+                console.error('Fetch error:', err);
+                document.getElementById('roster-table-body').innerHTML = `<tr><td colspan="8" class="p-6 text-center text-rose-500">Unable to reach backend server.</td></tr>`;
+            }
+        }
+
+        function getFilteredRoster() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            return allRoster.filter(item => 
+                (item.employee_id && item.employee_id.toLowerCase().includes(query)) ||
+                ((item.employee_lastname || '') + ', ' + (item.employee_firstname || '')).toLowerCase().includes(query) ||
+                (item.department && item.department.toLowerCase().includes(query)) ||
+                (item.job_title && item.job_title.toLowerCase().includes(query)) ||
+                (item.manager_name && item.manager_name.toLowerCase().includes(query)) ||
+                (item.username && item.username.toLowerCase().includes(query)) ||
+                (item.employee_status && item.employee_status.toLowerCase().includes(query))
+            );
+        }
+
+        function updateTable() {
+            const filtered = getFilteredRoster();
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value) || 10;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageData = filtered.slice(startIndex, endIndex);
+
+            document.getElementById('roster-count').textContent = allRoster.length;
+
+            const tbody = document.getElementById('roster-table-body');
+            if (pageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">No employee provisioning records found.</td></tr>`;
+            } else {
+                tbody.innerHTML = pageData.map(item => {
+                    let statusBadge = 'bg-amber-100 text-amber-700';
+                    const statusVal = item.employee_status ? item.employee_status.trim() : 'Probationary';
+                    
+                    if (statusVal === 'Regular') {
+                        statusBadge = 'bg-emerald-100 text-emerald-700';
+                    } else if (statusVal === 'Resigned') {
+                        statusBadge = 'bg-rose-100 text-rose-700';
+                    } else {
+                        statusBadge = 'bg-amber-100 text-amber-700';
+                    }
+
+                    let formattedName = 'N/A';
+                    if (item.employee_lastname && item.employee_firstname) {
+                        const middleNameStr = item.employee_middlename ? ` ${item.employee_middlename}` : '';
+                        formattedName = `${item.employee_lastname}, ${item.employee_firstname}${middleNameStr}`;
+                    } else if (item.employee_fullname) {
+                        formattedName = item.employee_fullname;
+                    }
+
+                    const dept = item.department || 'N/A';
+                    const title = item.job_title || 'N/A';
+                    const formattedDate = item.effective_date ? item.effective_date.split('T')[0] : 'N/A';
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-3.5 font-mono font-bold text-blue-600">
+                                <button onclick="openEditModal('${item.employee_id}')" class="hover:underline focus:outline-none flex items-center space-x-1" title="View/Edit Details">
+                                    <i class="fa-solid fa-eye text-xs text-slate-400"></i>
+                                    <span>${item.employee_id || 'N/A'}</span>
+                                </button>
+                            </td>
+                            <td class="p-3.5 font-semibold text-slate-900">${formattedName}</td>
+                            <td class="p-3.5 text-slate-700"><span class="font-medium">${dept}</span> <span class="text-slate-400 text-[11px]">(${title})</span></td>
+                            <td class="p-3.5 text-slate-600">${item.manager_name || 'N/A'}</td>
+                            <td class="p-3.5 font-mono font-medium text-indigo-600">${item.username || 'N/A'}</td>
+                            <td class="p-3.5 font-mono text-slate-600">${formattedDate}</td>
+                            <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${statusBadge}">${statusVal}</span></td>
+                            <td class="p-3.5 text-center space-x-2">
+                                <button onclick="openEditModal('${item.employee_id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-2.5 py-1 rounded text-[11px] font-medium transition" title="Edit Details">
+                                    <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
+                                </button>
+                                <button onclick="deleteRecord('${item.id || item.employee_id}', '${formattedName}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-2.5 py-1 rounded text-[11px] font-medium transition" title="Delete Record">
+                                    <i class="fa-solid fa-trash mr-1"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            const startEntry = filtered.length > 0 ? startIndex + 1 : 0;
+            const endEntry = Math.min(endIndex, filtered.length);
+            document.getElementById('pagination-info').textContent = `Showing ${startEntry} to ${endEntry} of ${filtered.length} entries`;
+            document.getElementById('page-indicator').textContent = `${currentPage} / ${totalPages}`;
+
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function handleSearch() {
+            currentPage = 1;
+            updateTable();
+        }
+
+        function changeRowsPerPage() {
+            currentPage = 1;
+            updateTable();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable();
+            }
+        }
+
+        function nextPage() {
+            const filtered = getFilteredRoster();
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value) || 10;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTable();
+            }
+        }
+
+        function openModal() {
+            const form = document.getElementById('roster-form');
+            if (form) form.reset();
+            document.getElementById('record_id').value = '';
+            document.getElementById('employee_id').disabled = false;
+            document.getElementById('admin-auth-container').classList.add('hidden');
+            document.getElementById('modal-title').innerHTML = '<i class="fa-solid fa-user-plus mr-2"></i> Onboard New Employee';
+            document.getElementById('save-btn').textContent = 'Save & Provision Account';
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('effective_date').value = today;
+
+            const modal = document.getElementById('roster-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function openEditModal(employeeId) {
+            const record = allRoster.find(r => r.employee_id === employeeId);
+            if (!record) {
+                alert('Employee record not found.');
+                return;
+            }
+
+            document.getElementById('roster-form').reset();
+            document.getElementById('record_id').value = record.id || '';
+            document.getElementById('employee_id').value = record.employee_id || '';
+            document.getElementById('employee_id').disabled = true; // Lock employee ID on edit
+            document.getElementById('department').value = record.department || '';
+            document.getElementById('employee_firstname').value = record.employee_firstname || '';
+            document.getElementById('employee_middlename').value = record.employee_middlename || '';
+            document.getElementById('employee_lastname').value = record.employee_lastname || '';
+            document.getElementById('job_title').value = record.job_title || '';
+            document.getElementById('manager_name').value = record.manager_name || '';
+            document.getElementById('employee_status').value = record.employee_status || 'Probationary';
+            
+            if (record.effective_date) {
+                document.getElementById('effective_date').value = record.effective_date.split('T')[0];
+            }
+
+            // Populate portal role from record.role joined from portal_users
+            const portalRoleField = document.getElementById('portal_role');
+            if (portalRoleField) {
+                portalRoleField.value = record.role || 'User';
+                
+                // Trigger check if it's already an admin role upon opening edit modal
+                const adminBox = document.getElementById('admin-auth-container');
+                const roleLabel = document.getElementById('selected-admin-role-label');
+                if (record.role === 'IT-Admin' || record.role === 'HR-Admin') {
+                    roleLabel.textContent = record.role;
+                    adminBox.classList.remove('hidden');
+                } else {
+                    adminBox.classList.add('hidden');
+                }
+            }
+
+            document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i> Edit Employee Details (${record.employee_id})`;
+            document.getElementById('save-btn').textContent = 'Update Changes';
+
+            const modal = document.getElementById('roster-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('roster-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function generateRandomPassword() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*?&";
+            let pwd = "";
+            for (let i = 0; i < 12; i++) {
+                pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return pwd;
+        }
+
+        async function handleSaveEmployee(event) {
+            event.preventDefault();
+
+            const employeeId = document.getElementById('employee_id').value.trim();
+            const firstName = document.getElementById('employee_firstname').value.trim();
+            const middleName = document.getElementById('employee_middlename').value.trim();
+            const lastName = document.getElementById('employee_lastname').value.trim();
+            const role = document.getElementById('portal_role').value;
+            const recordId = document.getElementById('record_id').value;
+
+            // Enforce admin password confirmation for privileged roles on both Add and Edit
+            if (role === 'IT-Admin' || role === 'HR-Admin') {
+                const adminUser = document.getElementById('admin_auth_username').value.trim();
+                const adminPass = document.getElementById('admin_auth_password').value;
+                if (!adminUser || !adminPass) {
+                    alert(`Please enter both username and password for ${role} authorization.`);
+                    return;
+                }
+                try {
+                    const authCheck = await fetch('/api/verify_admin_password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: adminUser, password: adminPass })
+                    });
+                    const authRes = await authCheck.json();
+                    if (!authRes.success) {
+                        alert('Invalid admin credentials or unauthorized account. Verification failed.');
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Auth verification error:', err);
+                    alert('Server connection error during admin verification.');
+                    return;
+                }
+            }
+
+            const temporaryPassword = generateRandomPassword();
+
+            const payload = {
+                employee_id: employeeId,
+                employee_firstname: firstName,
+                employee_middlename: middleName || null,
+                employee_lastname: lastName,
+                department: document.getElementById('department').value.trim(),
+                job_title: document.getElementById('job_title').value.trim(),
+                manager_name: document.getElementById('manager_name').value.trim() || null,
+                employee_status: document.getElementById('employee_status').value,
+                effective_date: document.getElementById('effective_date').value,
+                temp_password: temporaryPassword,
+                role: role
+            };
+
+            try {
+                const response = await fetch('/api/provisioning_roster', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    closeModal();
+                    fetchRosterData();
+                    alert(`Employee record saved successfully!`);
+                } else {
+                    alert(result.message || 'Failed to save employee record.');
+                }
+            } catch (err) {
+                console.error('Error saving employee record:', err);
+                alert('Server connection error.');
+            }
+        }
+
+        async function deleteRecord(targetId, employeeName) {
+            const confirmed = confirm(`Are you sure you want to delete the provisioning record and portal account for "${employeeName}" (ID: ${targetId})? This action cannot be undone.`);
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch(`/api/provisioning_roster/${targetId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    fetchRosterData();
+                } else {
+                    alert(result.message || 'Failed to delete record.');
+                }
+            } catch (err) {
+                console.error('Error deleting record:', err);
+                alert('Server connection error.');
+            }
+        }
+
+        window.handleSearch = handleSearch;
+        window.changeRowsPerPage = changeRowsPerPage;
+        window.prevPage = prevPage;
+        window.nextPage = nextPage;
+        window.openModal = openModal;
+        window.openEditModal = openEditModal;
+        window.closeModal = closeModal;
+        window.handleSaveEmployee = handleSaveEmployee;
+        window.deleteRecord = deleteRecord;
+        window.logout = logout;
+    </script>
+</body>
+</html>

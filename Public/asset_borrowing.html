@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Borrowing Tracker - FPI IT Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between hidden md:flex border-r border-slate-800">
+        <div>
+            <div class="p-5 border-b border-slate-800 flex flex-col items-center text-center space-y-2">
+                <img src="logo.png" alt="Fabricator Philippines Incorporated" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
+                <p class="text-xs text-slate-400">Batino Branch | IT Portal</p>
+            </div>
+            <nav class="p-4 space-y-1 text-sm">
+                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hardware_assets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-laptop w-5"></i>
+                    <span>Hardware Assets</span>
+                </a>
+                <a href="access_audit_logs.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-file-shield w-5"></i>
+                    <span>Access Audit Tracker</span>
+                </a>
+                <a href="asset_borrowing.html" class="flex items-center space-x-3 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium transition">
+                    <i class="fa-solid fa-handshake-angle w-5"></i>
+                    <span>Asset Borrowing</span>
+                </a>
+                <a href="it_support_tickets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-ticket w-5"></i>
+                    <span>IT Support Tickets</span>
+                </a>
+                <a href="storage.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-database w-5"></i>
+                    <span>Backup & Storage</span>
+                </a>
+                <a href="provisioning_roster.html" id="roster-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-users-gear w-5"></i>
+                    <span>Provisioning Roster (Admin)</span>
+                </a>
+                <a href="user_management.html" id="usermgmt-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-user-gear w-5"></i>
+                    <span>User Management (Admin)</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <div>
+                <p id="sidebar-username" class="font-semibold text-slate-200">Loading...</p>
+                <p class="text-emerald-400">● Secure System Online</p>
+            </div>
+            <i class="fa-solid fa-shield-halved text-blue-500 text-lg"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- HEADER WITH USER PROFILE DROPDOWN -->
+        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <span class="text-slate-500 text-sm">IT Portal</span>
+                <span class="text-slate-300">/</span>
+                <h2 class="text-slate-800 font-bold text-lg">Asset Borrowing Tracker</h2>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button onclick="openBorrowModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-2 shadow-sm">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Borrow Record</span>
+                </button>
+
+                <!-- Top-Right User Profile with Hover Dropdown Menu -->
+                <div class="relative group border-l pl-4 border-slate-200 cursor-pointer">
+                    <div class="flex items-center space-x-2 py-2">
+                        <div id="header-user-initials" class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">--</div>
+                        <span id="header-user-name" class="text-sm font-medium text-slate-700">Loading...</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
+                    </div>
+
+                    <!-- Dropdown Menu -->
+                    <div class="absolute right-0 w-48 bg-white border border-slate-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-50">
+                        <a href="change_password.html" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 transition">
+                            <i class="fa-solid fa-key mr-2 text-slate-400"></i> Change Password
+                        </a>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <button onclick="logout()" class="w-full text-left block px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 transition">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN TABLE CONTAINER -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search borrower, item code, ID..." 
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end text-xs text-slate-500 font-medium">
+                    <div class="flex items-center space-x-2">
+                        <span>Show:</span>
+                        <select id="rows-per-page" onchange="changeRowsPerPage()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 font-semibold">
+                            <option value="10" selected>10 rows</option>
+                            <option value="25">25 rows</option>
+                            <option value="50">50 rows</option>
+                            <option value="100">100 rows</option>
+                        </select>
+                    </div>
+                    <div>
+                        Total Records: <span id="borrow-count" class="font-bold text-slate-800">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3.5">Borrow ID</th>
+                                <th class="p-3.5">Employee ID</th>
+                                <th class="p-3.5">Borrower Name</th>
+                                <th class="p-3.5">Department</th>
+                                <th class="p-3.5">Category</th>
+                                <th class="p-3.5">Item Code</th>
+                                <th class="p-3.5">Date Borrowed</th>
+                                <th class="p-3.5">Date Returned</th>
+                                <th class="p-3.5">Status</th>
+                                <th class="p-3.5 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="borrow-table-body" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="10" class="p-6 text-center text-slate-400">Loading asset borrowing records...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PAGINATION CONTROLS BAR -->
+                <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between text-xs text-slate-600">
+                    <div id="pagination-info">Showing 0 to 0 of 0 entries</div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="prevPage()" id="prev-btn" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+                        </button>
+                        <span id="page-indicator" class="font-bold px-2 text-slate-800">1 / 1</span>
+                        <button onclick="nextPage()" id="next-btn" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            Next <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. ADD BORROW RECORD MODAL -->
+    <div id="borrow-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-xl overflow-hidden border border-slate-200">
+            <div class="flex justify-between items-center bg-slate-900 text-white px-6 py-4">
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-handshake-angle mr-2"></i> New Asset Borrowing Record</h3>
+                <button onclick="closeBorrowModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="add-borrow-form" onsubmit="handleBorrowSubmit(event)" class="p-6 space-y-4 text-xs max-h-[80vh] overflow-y-auto">
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                    <label class="block font-semibold text-slate-700">Lookup Employee from Roster</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="lookup_employee_number" placeholder="Enter Employee ID (e.g. 3373)" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-mono">
+                        <button type="button" onclick="lookupEmployeeRoster()" class="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 font-medium whitespace-nowrap">Search</button>
+                    </div>
+                    <p id="lookup-status" class="text-[11px] text-slate-500 mt-1">Enter an ID and click Search to auto-fill borrower details.</p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">First Name *</label>
+                        <input type="text" id="employee_firstname" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Middle Name</label>
+                        <input type="text" id="employee_middlename" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Last Name *</label>
+                        <input type="text" id="employee_lastname" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Department *</label>
+                        <input type="text" id="department" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Equipment Category *</label>
+                        <select id="equipment_category" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                            <option value="Laptop">Laptop</option>
+                            <option value="Desktop">Desktop</option>
+                            <option value="Tablet">Tablet</option>
+                            <option value="Projector">Projector</option>
+                            <option value="Camera">Camera</option>
+                            <option value="Peripherals">Peripherals</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Item Code / Asset Code *</label>
+                        <input type="text" id="item_code" required placeholder="e.g. FPI-BAT-DSK-001" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Date Borrowed *</label>
+                        <input type="date" id="date_borrowed" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Purpose / Remarks</label>
+                    <textarea id="purpose" rows="2" placeholder="Purpose of borrowing..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeBorrowModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. VIEW BORROW RECORD MODAL -->
+    <div id="view-borrow-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-xl overflow-hidden border border-slate-200">
+            <div class="flex justify-between items-center bg-slate-900 text-white px-6 py-4">
+                <h3 class="font-bold text-sm">Borrow Record ID: <span id="v-log-id" class="font-mono text-blue-400"></span></h3>
+                <button onclick="closeViewBorrowModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs max-h-[80vh] overflow-y-auto">
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                    <div><span class="text-slate-500 block">Employee ID</span><strong id="v-employee-id" class="font-mono text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Borrower Name</span><strong id="v-borrower-name" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Department</span><strong id="v-department" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Category</span><strong id="v-category" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Item Code</span><strong id="v-item-code" class="font-mono text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Date Borrowed</span><strong id="v-date-borrowed" class="font-mono text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Date Returned</span><strong id="v-date-returned" class="font-mono text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Return Condition</span><strong id="v-return-condition" class="text-slate-800"></strong></div>
+                    <div class="col-span-2"><span class="text-slate-500 block">Received By (IT Staff)</span><strong id="v-received-by" class="text-slate-800"></strong></div>
+                </div>
+                <div>
+                    <span class="text-slate-500 block mb-1 font-medium">Purpose / Remarks</span>
+                    <p id="v-purpose" class="p-3 bg-slate-50 rounded-lg border border-slate-100 text-slate-700 italic"></p>
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="deleteCurrentBorrowRecord()" class="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg font-medium"><i class="fa-solid fa-trash mr-1"></i> Delete Record</button>
+                    <div class="space-x-2">
+                        <button onclick="openReturnModal()" class="px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg font-medium"><i class="fa-solid fa-rotate-left mr-1"></i> Process Return</button>
+                        <button onclick="closeViewBorrowModal()" class="px-4 py-2 bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-lg font-medium">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. PROCESS RETURN MODAL -->
+    <div id="return-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="flex justify-between items-center bg-slate-900 text-white px-6 py-4">
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-rotate-left mr-2"></i> Process Asset Return</h3>
+                <button onclick="closeReturnModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="return-form" onsubmit="handleReturnSubmit(event)" class="p-6 space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Return Condition *</label>
+                    <select id="return_condition" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                        <option value="Good">Good / Operational</option>
+                        <option value="Minor Damage">Minor Damage / Scratch</option>
+                        <option value="Needs Repair">Needs Repair / Defective</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Received By (IT Staff Name) *</label>
+                    <input type="text" id="return_received_by" required placeholder="e.g. Darryl Louis Carillo" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeReturnModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700">Confirm Return</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GLOBAL AUTH SYNC SCRIPT -->
+    <script src="auth-sync.js"></script>
+
+    <!-- CLIENT SCRIPT -->
+    <script>
+        let allBorrowRecords = [];
+        let currentBorrowRecord = null;
+        let currentPage = 1;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            const dateBorrowedElem = document.getElementById('date_borrowed');
+            if (dateBorrowedElem) dateBorrowedElem.value = today;
+
+            fetchBorrowRecords();
+        });
+
+        function logout() {
+            localStorage.removeItem('portal_users');
+            localStorage.removeItem('userData');
+            window.location.href = "index.html";
+        }
+
+        async function fetchBorrowRecords() {
+            try {
+                const response = await fetch('/api/asset_borrowing');
+                const result = await response.json();
+
+                if (result.success) {
+                    allBorrowRecords = result.data;
+                    const countElem = document.getElementById('borrow-count');
+                    if (countElem) countElem.textContent = allBorrowRecords.length;
+                    updateTable();
+                }
+            } catch (err) {
+                console.error('Error fetching borrow logs:', err);
+            }
+        }
+
+        function getFilteredData() {
+            const searchInput = document.getElementById('search-input');
+            if (!searchInput) return allBorrowRecords;
+            const query = searchInput.value.toLowerCase();
+            
+            return allBorrowRecords.filter(item => {
+                const fullName = `${item.employee_firstname || ''} ${item.employee_lastname || ''}`.toLowerCase();
+                const code = (item.item_code || '').toLowerCase();
+                const logId = (item.log_id || '').toLowerCase();
+                return fullName.includes(query) || code.includes(query) || logId.includes(query);
+            });
+        }
+
+        function updateTable() {
+            const filtered = getFilteredData();
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value) || 10;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageData = filtered.slice(startIndex, endIndex);
+
+            const tbody = document.getElementById('borrow-table-body');
+            const countElem = document.getElementById('borrow-count');
+            if (countElem) countElem.textContent = allBorrowRecords.length;
+
+            if (!tbody) return;
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400">No asset borrowing records found.</td></tr>`;
+            } else {
+                tbody.innerHTML = pageData.map(record => {
+                    const fullName = `${record.employee_firstname || ''} ${record.employee_middlename ? record.employee_middlename + ' ' : ''}${record.employee_lastname || ''}`.trim();
+                    const isReturned = record.date_returned || (record.return_condition && record.return_condition !== 'Active');
+                    const statusBadge = isReturned 
+                        ? 'bg-emerald-100 text-emerald-700' 
+                        : 'bg-blue-100 text-blue-700';
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-3.5 font-mono font-bold text-blue-600">
+                                <button onclick="window.viewBorrowRecord('${record.log_id || record.id}')" class="hover:underline text-left">
+                                    ${record.log_id || `#${record.id}`}
+                                </button>
+                            </td>
+                            <td class="p-3.5 font-mono text-slate-500">${record.employee_id || 'N/A'}</td>
+                            <td class="p-3.5 font-semibold text-slate-800">${fullName}</td>
+                            <td class="p-3.5">${record.department || 'N/A'}</td>
+                            <td class="p-3.5">${record.equipment_category || 'N/A'}</td>
+                            <td class="p-3.5 font-mono text-slate-700">${record.item_code || 'N/A'}</td>
+                            <td class="p-3.5 font-mono text-slate-500">${record.date_borrowed ? record.date_borrowed.split('T')[0] : 'N/A'}</td>
+                            <td class="p-3.5 font-mono text-slate-500">${record.date_returned ? record.date_returned.split('T')[0] : 'Active'}</td>
+                            <td class="p-3.5">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${statusBadge}">${isReturned ? 'Returned' : 'Active'}</span>
+                            </td>
+                            <td class="p-3.5 text-center">
+                                <button onclick="window.viewBorrowRecord('${record.log_id || record.id}')" class="bg-blue-600 text-white px-2.5 py-1 rounded hover:bg-blue-700 text-[11px] font-medium">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Update Pagination Controls UI
+            const startEntry = filtered.length > 0 ? startIndex + 1 : 0;
+            const endEntry = Math.min(endIndex, filtered.length);
+            const paginationInfo = document.getElementById('pagination-info');
+            const pageIndicator = document.getElementById('page-indicator');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (paginationInfo) paginationInfo.textContent = `Showing ${startEntry} to ${endEntry} of ${filtered.length} entries`;
+            if (pageIndicator) pageIndicator.textContent = `${currentPage} / ${totalPages}`;
+            if (prevBtn) prevBtn.disabled = currentPage === 1;
+            if (nextBtn) nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function filterTable() {
+            currentPage = 1;
+            updateTable();
+        }
+
+        function changeRowsPerPage() {
+            currentPage = 1;
+            updateTable();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable();
+            }
+        }
+
+        function nextPage() {
+            const filtered = getFilteredData();
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value) || 10;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTable();
+            }
+        }
+
+        function openBorrowModal() {
+            const form = document.getElementById('add-borrow-form');
+            if (form) form.reset();
+            const today = new Date().toISOString().split('T')[0];
+            const dateBorrowedElem = document.getElementById('date_borrowed');
+            if (dateBorrowedElem) dateBorrowedElem.value = today;
+
+            const statusElem = document.getElementById('lookup-status');
+            if (statusElem) {
+                statusElem.textContent = "Enter an ID and click Search to auto-fill borrower details.";
+                statusElem.className = "text-[11px] text-slate-500 mt-1";
+            }
+
+            const modal = document.getElementById('borrow-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeBorrowModal() {
+            const modal = document.getElementById('borrow-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        async function lookupEmployeeRoster() {
+            const empNumInput = document.getElementById('lookup_employee_number').value.trim();
+            const statusElem = document.getElementById('lookup-status');
+            
+            if (!empNumInput) {
+                statusElem.textContent = "Please enter an Employee ID to search.";
+                statusElem.className = "text-[11px] text-amber-600 mt-1";
+                return;
+            }
+
+            try {
+                statusElem.textContent = "Searching roster database...";
+                statusElem.className = "text-[11px] text-blue-600 mt-1";
+
+                const response = await fetch(`/api/provisioning_roster/lookup/${encodeURIComponent(empNumInput)}`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    const found = result.data;
+                    
+                    document.getElementById('employee_firstname').value = found.employee_firstname || '';
+                    document.getElementById('employee_middlename').value = found.employee_middlename || '';
+                    document.getElementById('employee_lastname').value = found.employee_lastname || '';
+                    document.getElementById('department').value = found.department || '';
+
+                    statusElem.textContent = `✔ Match found: ${found.employee_firstname} ${found.employee_lastname} (${found.department || 'No Dept'})`;
+                    statusElem.className = "text-[11px] text-emerald-600 font-semibold mt-1";
+                } else {
+                    statusElem.textContent = "⚠ No record found in roster. You can manually enter borrower details below.";
+                    statusElem.className = "text-[11px] text-amber-600 mt-1";
+                }
+            } catch (err) {
+                console.error('Roster lookup error:', err);
+                statusElem.textContent = "⚠ Employee ID not found in roster. Manual entry permitted.";
+                statusElem.className = "text-[11px] text-amber-600 mt-1";
+            }
+        }
+
+        function viewBorrowRecord(idKey) {
+            currentBorrowRecord = allBorrowRecords.find(item => (item.log_id === idKey || String(item.id) === String(idKey)));
+            if (!currentBorrowRecord) return;
+
+            const r = currentBorrowRecord;
+            const fullName = `${r.employee_firstname || ''} ${r.employee_middlename ? r.employee_middlename + ' ' : ''}${r.employee_lastname || ''}`.trim();
+
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            };
+
+            setText('v-log-id', r.log_id || `#${r.id}`);
+            setText('v-employee-id', r.employee_id || 'N/A');
+            setText('v-borrower-name', fullName);
+            setText('v-department', r.department || 'N/A');
+            setText('v-category', r.equipment_category || 'N/A');
+            setText('v-item-code', r.item_code || 'N/A');
+            setText('v-date-borrowed', r.date_borrowed ? r.date_borrowed.split('T')[0] : 'N/A');
+            setText('v-date-returned', r.date_returned ? r.date_returned.split('T')[0] : 'Not Yet Returned');
+            setText('v-return-condition', r.return_condition || 'Active');
+            setText('v-received-by', r.received_by || 'N/A');
+            setText('v-purpose', r.purpose || 'No purpose recorded.');
+
+            const modal = document.getElementById('view-borrow-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeViewBorrowModal() {
+            const modal = document.getElementById('view-borrow-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function openReturnModal() {
+            closeViewBorrowModal();
+            const modal = document.getElementById('return-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeReturnModal() {
+            const modal = document.getElementById('return-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        async function handleBorrowSubmit(e) {
+            e.preventDefault();
+
+            const payload = {
+                employee_id: document.getElementById('lookup_employee_number').value.trim() || null,
+                employee_firstname: document.getElementById('employee_firstname').value.trim(),
+                employee_middlename: document.getElementById('employee_middlename').value.trim(),
+                employee_lastname: document.getElementById('employee_lastname').value.trim(),
+                department: document.getElementById('department').value.trim(),
+                equipment_category: document.getElementById('equipment_category').value,
+                item_code: document.getElementById('item_code').value.trim(),
+                date_borrowed: document.getElementById('date_borrowed').value,
+                purpose: document.getElementById('purpose').value.trim()
+            };
+
+            try {
+                const response = await fetch('/api/asset_borrowing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    closeBorrowModal();
+                    fetchBorrowRecords();
+                } else {
+                    alert(result.message || 'Failed to save borrowing record.');
+                }
+            } catch (err) {
+                console.error('Submit error:', err);
+                alert('Server connection error.');
+            }
+        }
+
+        async function handleReturnSubmit(e) {
+            e.preventDefault();
+            if (!currentBorrowRecord) return;
+
+            const recordId = currentBorrowRecord.log_id; 
+
+            const payload = {
+                return_condition: document.getElementById('return_condition').value,
+                received_by: document.getElementById('return_received_by').value.trim()
+            };
+
+            try {
+                const response = await fetch(`/api/asset_borrowing/${recordId}/return`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    closeReturnModal();
+                    fetchBorrowRecords();
+                    alert('Asset return processed successfully!');
+                } else {
+                    alert(result.message || 'Failed to process return.');
+                }
+            } catch (err) {
+                console.error('Error processing return:', err);
+                alert('Server connection error.');
+            }
+        }
+
+        async function deleteCurrentBorrowRecord() {
+            if (!currentBorrowRecord) return;
+            const recordId = currentBorrowRecord.log_id || currentBorrowRecord.id;
+
+            if (!confirm(`Are you sure you want to delete borrowing record ${recordId}?`)) return;
+
+            try {
+                const response = await fetch(`/api/asset_borrowing/${recordId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    closeViewBorrowModal();
+                    fetchBorrowRecords();
+                    alert('Borrowing record deleted successfully!');
+                } else {
+                    alert(result.message || 'Failed to delete record.');
+                }
+            } catch (err) {
+                console.error('Error deleting record:', err);
+                alert('Server connection error.');
+            }
+        }
+
+        window.viewBorrowRecord = viewBorrowRecord;
+        window.openBorrowModal = openBorrowModal;
+        window.closeBorrowModal = closeBorrowModal;
+        window.closeViewBorrowModal = closeViewBorrowModal;
+        window.openReturnModal = openReturnModal;
+        window.closeReturnModal = closeReturnModal;
+        window.lookupEmployeeRoster = lookupEmployeeRoster;
+        window.handleBorrowSubmit = handleBorrowSubmit;
+        window.handleReturnSubmit = handleReturnSubmit;
+        window.deleteCurrentBorrowRecord = deleteCurrentBorrowRecord;
+        window.filterTable = filterTable;
+        window.changeRowsPerPage = changeRowsPerPage;
+        window.prevPage = prevPage;
+        window.nextPage = nextPage;
+        window.logout = logout;
+    </script>
+</body>
+</html>

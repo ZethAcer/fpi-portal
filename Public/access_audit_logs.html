@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Audit Tracker - FPI IT Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between hidden md:flex border-r border-slate-800">
+        <div>
+            <div class="p-5 border-b border-slate-800 flex flex-col items-center text-center space-y-2">
+                <img src="logo.png" alt="Fabricator Philippines Incorporated" class="h-8 w-auto object-contain">
+                <p class="text-xs text-slate-400">Batino Branch | IT Portal</p>
+            </div>
+            <nav class="p-4 space-y-1 text-sm">
+                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hardware_assets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-laptop w-5"></i>
+                    <span>Hardware Assets</span>
+                </a>
+                <a href="access_audit_logs.html" class="flex items-center space-x-3 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium transition">
+                    <i class="fa-solid fa-file-shield w-5"></i>
+                    <span>Access Audit Tracker</span>
+                </a>
+                <a href="asset_borrowing.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-handshake-angle w-5"></i>
+                    <span>Asset Borrowing</span>
+                </a>
+                <a href="it_support_tickets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-ticket w-5"></i>
+                    <span>IT Support Tickets</span>
+                </a>
+                <a href="storage.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-database w-5"></i>
+                    <span>Backup & Storage</span>
+                </a>
+                <a href="provisioning_roster.html" id="roster-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-users-gear w-5"></i>
+                    <span>Provisioning Roster (Admin)</span>
+                </a>
+                <a href="user_management.html" id="usermgmt-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-user-gear w-5"></i>
+                    <span>User Management (Admin)</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <div>
+                <p id="sidebar-username" class="font-semibold text-slate-200">Loading...</p>
+                <p class="text-emerald-400">● Secure System Online</p>
+            </div>
+            <i class="fa-solid fa-shield-halved text-blue-500 text-lg"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- HEADER WITH USER PROFILE DROPDOWN -->
+        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <span class="text-slate-500 text-sm">IT Portal</span>
+                <span class="text-slate-300">/</span>
+                <h2 class="text-slate-800 font-bold text-lg">Access Audit Tracker</h2>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button onclick="openAuditModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-2 shadow-sm">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Audit Log</span>
+                </button>
+
+                <!-- Top-Right User Profile with Hover Dropdown Menu -->
+                <div class="relative group border-l pl-4 border-slate-200 cursor-pointer">
+                    <div class="flex items-center space-x-2 py-2">
+                        <div id="header-user-initials" class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">--</div>
+                        <span id="header-user-name" class="text-sm font-medium text-slate-700">Loading...</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
+                    </div>
+
+                    <!-- Dropdown Menu -->
+                    <div class="absolute right-0 w-48 bg-white border border-slate-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-50">
+                        <a href="change_password.html" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 transition">
+                            <i class="fa-solid fa-key mr-2 text-slate-400"></i> Change Password
+                        </a>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <button onclick="logout()" class="w-full text-left block px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 transition">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN TABLE CONTAINER -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Search logs, employee ID, system..." 
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end text-xs text-slate-500 font-medium">
+                    <div class="flex items-center space-x-2">
+                        <span>Show:</span>
+                        <select id="rows-per-page" onchange="changeRowsPerPage()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 font-semibold">
+                            <option value="10" selected>10 rows</option>
+                            <option value="25">25 rows</option>
+                            <option value="50">50 rows</option>
+                            <option value="100">100 rows</option>
+                        </select>
+                    </div>
+                    <div>
+                        Total Audit Records: <span id="log-count" class="font-bold text-slate-800">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3.5">Log ID</th>
+                                <th class="p-3.5">App. Date</th>
+                                <th class="p-3.5">Action Type</th>
+                                <th class="p-3.5">Employee ID</th>
+                                <th class="p-3.5">Employee Name</th>
+                                <th class="p-3.5">Department</th>
+                                <th class="p-3.5">System App</th>
+                                <th class="p-3.5">Access Level</th>
+                                <th class="p-3.5">Assigned UserID</th>
+                                <th class="p-3.5">Status</th>
+                                <th class="p-3.5">Execution Date</th>
+                                <th class="p-3.5 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table-body" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="12" class="p-6 text-center text-slate-400">Loading audit records...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PAGINATION CONTROLS BAR -->
+                <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between text-xs text-slate-600">
+                    <div id="pagination-info">Showing 0 to 0 of 0 entries</div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="prevPage()" id="prev-btn" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+                        </button>
+                        <span id="page-indicator" class="font-bold px-2 text-slate-800">1 / 1</span>
+                        <button onclick="nextPage()" id="next-btn" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            Next <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. ADD AUDIT LOG MODAL -->
+    <div id="audit-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden border border-slate-200">
+            <div class="flex justify-between items-center bg-slate-900 text-white px-6 py-4">
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-file-shield mr-2"></i> Encode New Access Audit Log</h3>
+                <button onclick="closeAuditModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="add-audit-form" onsubmit="handleAuditSubmit(event)" class="p-6 space-y-4 text-xs max-h-[80vh] overflow-y-auto">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Application Date</label>
+                        <input type="date" id="application_date" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Action Type</label>
+                        <select id="action_type" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                            <option value="Grant Access">Grant Access</option>
+                            <option value="Modify Access">Modify Access</option>
+                            <option value="Revoke Access">Revoke Access</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">First Name</label>
+                        <input type="text" id="employee_firstname" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Middle Name</label>
+                        <input type="text" id="employee_middlename" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Last Name</label>
+                        <input type="text" id="employee_lastname" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Employee ID</label>
+                        <input type="text" id="employee_id" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Department</label>
+                        <input type="text" id="department" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Manager Name</label>
+                        <input type="text" id="employee_manager" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">System Application</label>
+                        <input type="text" id="system_application_name" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg" placeholder="e.g. ERP / SAP">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Access Level</label>
+                        <input type="text" id="access_level" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg" placeholder="e.g. Admin / Read-Write">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Assigned User ID</label>
+                        <input type="text" id="assigned_userid" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Business Jurisdiction</label>
+                    <input type="text" id="business_jurisdiction" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Approval Method</label>
+                        <input type="text" id="approval_method" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg" placeholder="e.g. Ticket / Email">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Approval Status</label>
+                        <select id="approval_status" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                            <option value="Approved">Approved</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Processed By</label>
+                        <input type="text" id="processed_by" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Execution Date</label>
+                        <input type="date" id="execution_date" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Retention Expiry Date (+3 Yrs)</label>
+                        <input type="date" id="retention_expiry_date" readonly class="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 font-mono">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeAuditModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">Save Audit Log</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. VIEW AUDIT LOG MODAL -->
+    <div id="view-audit-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-xl overflow-hidden border border-slate-200">
+            <div class="flex justify-between items-center bg-slate-900 text-white px-6 py-4">
+                <h3 class="font-bold text-sm">Audit Log Details: <span id="v-log-id" class="font-mono text-blue-400"></span></h3>
+                <button onclick="closeViewAuditModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs max-h-[80vh] overflow-y-auto">
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                    <div><span class="text-slate-500 block">Log ID</span><strong id="v-log-id-val" class="font-mono text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Application Date</span><strong id="v-app-date" class="font-mono text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Action Type</span><strong id="v-action-type" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Employee Information</span><strong id="v-emp-info" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Department & Manager</span><strong id="v-dept-manager" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">System Application</span><strong id="v-system" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Access Level</span><strong id="v-access-level" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Assigned UserID</span><strong id="v-userid" class="font-mono text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Business Jurisdiction</span><strong id="v-jurisdiction" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Approval Method</span><strong id="v-approval-method" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Approval Status</span><strong id="v-approval-status" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Processed By</span><strong id="v-processed-by" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Execution Date</span><strong id="v-execution-date" class="font-mono text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 block">Retention Expiry</span><strong id="v-retention-expiry" class="font-mono text-slate-800"></strong></div>
+                </div>
+                <div class="flex justify-end items-center pt-2">
+                    <div class="space-x-2">
+                        <button onclick="openEditAuditModal()" class="px-4 py-2 bg-slate-800 text-white hover:bg-slate-900 rounded-lg font-medium"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</button>
+                        <button onclick="closeViewAuditModal()" class="px-4 py-2 bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-lg font-medium">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. EDIT AUDIT LOG MODAL -->
+    <div id="edit-audit-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden border border-slate-200">
+            <div class="flex justify-between items-center bg-slate-900 text-white px-6 py-4">
+                <h3 class="font-bold text-sm">Edit Audit Log: <span id="edit-modal-log-id" class="font-mono text-blue-400"></span></h3>
+                <button onclick="closeEditAuditModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="edit-audit-form" onsubmit="handleEditAuditSubmit(event)" class="p-6 space-y-4 text-xs max-h-[80vh] overflow-y-auto">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Application Date</label>
+                        <input type="date" id="edit_application_date" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Action Type</label>
+                        <select id="edit_action_type" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                            <option value="Grant Access">Grant Access</option>
+                            <option value="Modify Access">Modify Access</option>
+                            <option value="Revoke Access">Revoke Access</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">First Name</label>
+                        <input type="text" id="edit_employee_firstname" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Middle Name</label>
+                        <input type="text" id="edit_employee_middlename" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Last Name</label>
+                        <input type="text" id="edit_employee_lastname" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Employee ID</label>
+                        <input type="text" id="edit_employee_id" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Department</label>
+                        <input type="text" id="edit_department" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Manager Name</label>
+                        <input type="text" id="edit_employee_manager" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">System Application</label>
+                        <input type="text" id="edit_system_application_name" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Access Level</label>
+                        <input type="text" id="edit_access_level" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Assigned User ID</label>
+                        <input type="text" id="edit_assigned_userid" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Business Jurisdiction</label>
+                    <input type="text" id="edit_business_jurisdiction" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Approval Method</label>
+                        <input type="text" id="edit_approval_method" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Approval Status</label>
+                        <select id="edit_approval_status" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                            <option value="Approved">Approved</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Processed By</label>
+                        <input type="text" id="edit_processed_by" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Execution Date</label>
+                        <input type="date" id="edit_execution_date" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Retention Expiry Date (+3 Yrs)</label>
+                        <input type="date" id="edit_retention_expiry_date" readonly class="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 font-mono">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeEditAuditModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">Update Audit Log</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GLOBAL AUTH SYNC SCRIPT -->
+    <script src="auth-sync.js"></script>
+
+    <!-- CLIENT SCRIPT -->
+    <script>
+        let allAuditLogs = [];
+        let currentAuditLog = null;
+        let currentPage = 1;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            
+            const appDateInput = document.getElementById('application_date');
+            const execDateInput = document.getElementById('execution_date');
+            const editExecDateInput = document.getElementById('edit_execution_date');
+
+            if (appDateInput) appDateInput.value = today;
+            if (execDateInput) {
+                execDateInput.value = today;
+                calculateExpiry('execution_date', 'retention_expiry_date');
+                execDateInput.addEventListener('change', () => calculateExpiry('execution_date', 'retention_expiry_date'));
+            }
+            if (editExecDateInput) {
+                editExecDateInput.addEventListener('change', () => calculateExpiry('edit_execution_date', 'edit_retention_expiry_date'));
+            }
+
+            fetchAuditLogs();
+        });
+
+        function logout() {
+            localStorage.removeItem('portal_users');
+            localStorage.removeItem('userData');
+            window.location.href = "index.html";
+        }
+
+        function calculateExpiry(execId, retentionId) {
+            const execField = document.getElementById(execId);
+            const retentionInput = document.getElementById(retentionId);
+            
+            if (!execField || !retentionInput) return;
+            const execVal = execField.value;
+            
+            if (!execVal) {
+                retentionInput.value = '';
+                return;
+            }
+
+            const d = new Date(execVal);
+            d.setFullYear(d.getFullYear() + 3);
+            retentionInput.value = d.toISOString().split('T')[0];
+        }
+
+        async function fetchAuditLogs() {
+            try {
+                const response = await fetch('/api/access_audit_logs');
+                const result = await response.json();
+
+                if (result.success) {
+                    allAuditLogs = result.data;
+                    document.getElementById('log-count').textContent = allAuditLogs.length;
+                    updateTable();
+                }
+            } catch (err) {
+                console.error('Error fetching audit logs:', err);
+            }
+        }
+
+        function getFilteredData() {
+            const searchInput = document.getElementById('search-input');
+            if (!searchInput) return allAuditLogs;
+            const query = searchInput.value.toLowerCase();
+            
+            return allAuditLogs.filter(item => {
+                const fullName = `${item.employee_firstname || ''} ${item.employee_lastname || ''}`.toLowerCase();
+                return fullName.includes(query) ||
+                    (item.log_id && item.log_id.toLowerCase().includes(query)) ||
+                    (item.system_application_name && item.system_application_name.toLowerCase().includes(query)) ||
+                    (item.employee_id && item.employee_id.toLowerCase().includes(query));
+            });
+        }
+
+        function updateTable() {
+            const filtered = getFilteredData();
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value) || 10;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageData = filtered.slice(startIndex, endIndex);
+
+            const tbody = document.getElementById('audit-table-body');
+            if (!tbody) return;
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="p-6 text-center text-slate-400">No access audit logs recorded yet.</td></tr>`;
+            } else {
+                tbody.innerHTML = pageData.map(log => {
+                    const fullName = `${log.employee_firstname || ''} ${log.employee_middlename ? log.employee_middlename + ' ' : ''}${log.employee_lastname || ''}`.trim();
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-3.5 font-mono font-bold text-blue-600">
+                                <button onclick="window.viewAuditLog('${log.log_id}')" class="hover:underline text-left">
+                                    ${log.log_id}
+                                </button>
+                            </td>
+                            <td class="p-3.5 font-mono text-slate-600">${log.application_date ? new Date(log.application_date).toISOString().split('T')[0] : 'N/A'}</td>
+                            <td class="p-3.5"><span class="px-2 py-0.5 rounded font-medium bg-slate-100 text-slate-700 text-[10px]">${log.action_type || 'N/A'}</span></td>
+                            <td class="p-3.5 font-mono text-slate-500">${log.employee_id}</td>
+                            <td class="p-3.5 font-semibold text-slate-800">${fullName}</td>
+                            <td class="p-3.5">${log.department || 'N/A'}</td>
+                            <td class="p-3.5 font-medium text-slate-700">${log.system_application_name}</td>
+                            <td class="p-3.5">${log.access_level}</td>
+                            <td class="p-3.5 font-mono text-slate-500">${log.assigned_userid || 'N/A'}</td>
+                            <td class="p-3.5">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusBadge(log.approval_status)}">${log.approval_status || 'Pending'}</span>
+                            </td>
+                            <td class="p-3.5 font-mono text-slate-500">${log.execution_date ? new Date(log.execution_date).toISOString().split('T')[0] : 'Pending'}</td>
+                            <td class="p-3.5 text-center">
+                                <button onclick="window.viewAuditLog('${log.log_id}')" class="bg-blue-600 text-white px-2.5 py-1 rounded hover:bg-blue-700 text-[11px] font-medium">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            const startEntry = filtered.length > 0 ? startIndex + 1 : 0;
+            const endEntry = Math.min(endIndex, filtered.length);
+            document.getElementById('pagination-info').textContent = `Showing ${startEntry} to ${endEntry} of ${filtered.length} entries`;
+            document.getElementById('page-indicator').textContent = `${currentPage} / ${totalPages}`;
+
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function filterTable() {
+            currentPage = 1;
+            updateTable();
+        }
+
+        function changeRowsPerPage() {
+            currentPage = 1;
+            updateTable();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable();
+            }
+        }
+
+        function nextPage() {
+            const filtered = getFilteredData();
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value) || 10;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTable();
+            }
+        }
+
+        function getStatusBadge(status) {
+            if (!status) return 'bg-amber-100 text-amber-700';
+            if (status.includes('Approved')) return 'bg-emerald-100 text-emerald-700';
+            if (status.includes('Rejected')) return 'bg-rose-100 text-rose-700';
+            return 'bg-amber-100 text-amber-700';
+        }
+
+        function openAuditModal() {
+            const form = document.getElementById('add-audit-form');
+            if (form) form.reset();
+            const today = new Date().toISOString().split('T')[0];
+            
+            const appDate = document.getElementById('application_date');
+            const execDate = document.getElementById('execution_date');
+            if (appDate) appDate.value = today;
+            if (execDate) execDate.value = today;
+            calculateExpiry('execution_date', 'retention_expiry_date');
+
+            const modal = document.getElementById('audit-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeAuditModal() {
+            const modal = document.getElementById('audit-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function viewAuditLog(logId) {
+            currentAuditLog = allAuditLogs.find(item => item.log_id === logId);
+            if (!currentAuditLog) return;
+
+            const log = currentAuditLog;
+            const fullName = `${log.employee_firstname || ''} ${log.employee_middlename ? log.employee_middlename + ' ' : ''}${log.employee_lastname || ''}`.trim();
+
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            };
+
+            setText('v-log-id', log.log_id);
+            setText('v-log-id-val', log.log_id);
+            setText('v-app-date', log.application_date ? new Date(log.application_date).toISOString().split('T')[0] : 'N/A');
+            setText('v-action-type', log.action_type || 'N/A');
+            setText('v-emp-info', `[${log.employee_id}] ${fullName}`);
+            setText('v-dept-manager', `${log.department || 'N/A'} (Mgr: ${log.employee_manager || 'N/A'})`);
+            setText('v-system', log.system_application_name || 'N/A');
+            setText('v-access-level', log.access_level || 'N/A');
+            setText('v-userid', log.assigned_userid || 'N/A');
+            setText('v-jurisdiction', log.business_jurisdiction || 'None specified.');
+            setText('v-approval-method', log.approval_method || 'N/A');
+            setText('v-approval-status', log.approval_status || 'Pending');
+            setText('v-processed-by', log.processed_by || 'N/A');
+            setText('v-execution-date', log.execution_date ? new Date(log.execution_date).toISOString().split('T')[0] : 'N/A');
+            setText('v-retention-expiry', log.retention_expiry_date ? new Date(log.retention_expiry_date).toISOString().split('T')[0] : 'N/A');
+
+            const modal = document.getElementById('view-audit-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeViewAuditModal() {
+            const modal = document.getElementById('view-audit-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function openEditAuditModal() {
+            if (!currentAuditLog) return;
+
+            document.getElementById('edit-modal-log-id').textContent = currentAuditLog.log_id;
+            document.getElementById('edit_application_date').value = currentAuditLog.application_date ? new Date(currentAuditLog.application_date).toISOString().split('T')[0] : '';
+            document.getElementById('edit_action_type').value = currentAuditLog.action_type || 'Grant Access';
+            document.getElementById('edit_employee_id').value = currentAuditLog.employee_id || '';
+            document.getElementById('edit_department').value = currentAuditLog.department || '';
+            document.getElementById('edit_employee_firstname').value = currentAuditLog.employee_firstname || '';
+            document.getElementById('edit_employee_middlename').value = currentAuditLog.employee_middlename || '';
+            document.getElementById('edit_employee_lastname').value = currentAuditLog.employee_lastname || '';
+            document.getElementById('edit_employee_manager').value = currentAuditLog.employee_manager || '';
+            document.getElementById('edit_assigned_userid').value = currentAuditLog.assigned_userid || '';
+            document.getElementById('edit_system_application_name').value = currentAuditLog.system_application_name || '';
+            document.getElementById('edit_access_level').value = currentAuditLog.access_level || '';
+            document.getElementById('edit_business_jurisdiction').value = currentAuditLog.business_jurisdiction || '';
+            document.getElementById('edit_approval_method').value = currentAuditLog.approval_method || '';
+            document.getElementById('edit_approval_status').value = currentAuditLog.approval_status || 'Pending';
+            
+            const execDateStr = currentAuditLog.execution_date ? new Date(currentAuditLog.execution_date).toISOString().split('T')[0] : '';
+            document.getElementById('edit_execution_date').value = execDateStr;
+            calculateExpiry('edit_execution_date', 'edit_retention_expiry_date');
+
+            document.getElementById('edit_processed_by').value = currentAuditLog.processed_by || '';
+
+            closeViewAuditModal();
+            const modal = document.getElementById('edit-audit-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeEditAuditModal() {
+            const modal = document.getElementById('edit-audit-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        async function handleAuditSubmit(e) {
+            e.preventDefault();
+
+            const payload = {
+                application_date: document.getElementById('application_date').value,
+                action_type: document.getElementById('action_type').value,
+                employee_id: document.getElementById('employee_id').value.trim(),
+                employee_firstname: document.getElementById('employee_firstname').value.trim(),
+                employee_middlename: document.getElementById('employee_middlename').value.trim(),
+                employee_lastname: document.getElementById('employee_lastname').value.trim(),
+                department: document.getElementById('department').value.trim(),
+                employee_manager: document.getElementById('employee_manager').value.trim(),
+                assigned_userid: document.getElementById('assigned_userid').value.trim(),
+                system_application_name: document.getElementById('system_application_name').value.trim(),
+                access_level: document.getElementById('access_level').value.trim(),
+                business_jurisdiction: document.getElementById('business_jurisdiction').value.trim(),
+                approval_method: document.getElementById('approval_method').value.trim(),
+                approval_status: document.getElementById('approval_status').value,
+                processed_by: document.getElementById('processed_by').value.trim(),
+                execution_date: document.getElementById('execution_date').value || null,
+                retention_expiry_date: document.getElementById('retention_expiry_date').value || null
+            };
+
+            try {
+                const response = await fetch('/api/access_audit_logs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    closeAuditModal();
+                    fetchAuditLogs();
+                } else {
+                    alert(result.message || 'Failed to save audit log.');
+                }
+            } catch (err) {
+                console.error('Submit error:', err);
+                alert('Server connection error.');
+            }
+        }
+
+        async function handleEditAuditSubmit(e) {
+            e.preventDefault();
+            if (!currentAuditLog) return;
+
+            const updatedPayload = {
+                application_date: document.getElementById('edit_application_date').value,
+                action_type: document.getElementById('edit_action_type').value,
+                employee_id: document.getElementById('edit_employee_id').value.trim(),
+                employee_firstname: document.getElementById('edit_employee_firstname').value.trim(),
+                employee_middlename: document.getElementById('edit_employee_middlename').value.trim(),
+                employee_lastname: document.getElementById('edit_employee_lastname').value.trim(),
+                department: document.getElementById('edit_department').value.trim(),
+                employee_manager: document.getElementById('edit_employee_manager').value.trim(),
+                assigned_userid: document.getElementById('edit_assigned_userid').value.trim(),
+                system_application_name: document.getElementById('edit_system_application_name').value.trim(),
+                access_level: document.getElementById('edit_access_level').value.trim(),
+                business_jurisdiction: document.getElementById('edit_business_jurisdiction').value.trim(),
+                approval_method: document.getElementById('edit_approval_method').value.trim(),
+                approval_status: document.getElementById('edit_approval_status').value,
+                processed_by: document.getElementById('edit_processed_by').value.trim(),
+                execution_date: document.getElementById('edit_execution_date').value || null,
+                retention_expiry_date: document.getElementById('edit_retention_expiry_date').value || null
+            };
+
+            try {
+                const response = await fetch(`/api/access_audit_logs/${currentAuditLog.log_id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedPayload)
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    closeEditAuditModal();
+                    fetchAuditLogs();
+                    alert('Audit log updated successfully!');
+                } else {
+                    alert(result.message || 'Failed to update audit log.');
+                }
+            } catch (err) {
+                console.error('Error updating audit log:', err);
+                alert('Server connection error.');
+            }
+        }
+
+        window.viewAuditLog = viewAuditLog;
+        window.closeViewAuditModal = closeViewAuditModal;
+        window.openEditAuditModal = openEditAuditModal;
+        window.closeEditAuditModal = closeEditAuditModal;
+        window.openAuditModal = openAuditModal;
+        window.closeAuditModal = closeAuditModal;
+        window.handleAuditSubmit = handleAuditSubmit;
+        window.handleEditAuditSubmit = handleEditAuditSubmit;
+        window.filterTable = filterTable;
+        window.changeRowsPerPage = changeRowsPerPage;
+        window.prevPage = prevPage;
+        window.nextPage = nextPage;
+        window.logout = logout;
+    </script>
+</body>
+</html>

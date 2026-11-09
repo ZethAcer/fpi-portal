@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management (Admin) - FPI IT Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between hidden md:flex border-r border-slate-800">
+        <div>
+            <div class="p-5 border-b border-slate-800 flex flex-col items-center text-center space-y-2">
+                <img src="logo.png" alt="Fabricator Philippines Incorporated" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
+                <p class="text-xs text-slate-400">Batino Branch | IT Portal</p>
+            </div>
+            <nav class="p-4 space-y-1 text-sm">
+                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="hardware_assets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-laptop w-5"></i>
+                    <span>Hardware Assets</span>
+                </a>
+                <a href="access_audit_logs.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-file-shield w-5"></i>
+                    <span>Access Audit Tracker</span>
+                </a>
+                <a href="asset_borrowing.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-handshake-angle w-5"></i>
+                    <span>Asset Borrowing</span>
+                </a>
+                <a href="it_support_tickets.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-ticket w-5"></i>
+                    <span>IT Support Tickets</span>
+                </a>
+                <a href="storage.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-database w-5"></i>
+                    <span>Backup & Storage</span>
+                </a>
+                <a href="provisioning_roster.html" id="roster-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-users-gear w-5"></i>
+                    <span>Provisioning Roster (Admin)</span>
+                </a>
+                <a href="user_management.html" id="usermgmt-nav-link" class="hidden flex items-center space-x-3 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium transition">
+                    <i class="fa-solid fa-user-gear w-5"></i>
+                    <span>User Management (Admin)</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <div>
+                <p id="sidebar-username" class="font-semibold text-slate-200">Loading...</p>
+                <p class="text-emerald-400">● Secure System Online</p>
+            </div>
+            <i class="fa-solid fa-shield-halved text-blue-500 text-lg"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <span class="text-slate-500 text-sm">IT Portal</span>
+                <span class="text-slate-300">/</span>
+                <h2 class="text-slate-800 font-bold text-lg">User Management & Credentials</h2>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Top-Right User Profile Dropdown -->
+                <div class="relative group border-l pl-4 border-slate-200 cursor-pointer">
+                    <div class="flex items-center space-x-2 py-2">
+                        <div id="header-user-initials" class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">--</div>
+                        <span id="header-user-name" class="text-sm font-medium text-slate-700">Loading...</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
+                    </div>
+
+                    <div class="absolute right-0 w-48 bg-white border border-slate-200 rounded-lg shadow-lg py-1 hidden group-hover:block z-50">
+                        <a href="change_password.html" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 transition">
+                            <i class="fa-solid fa-key mr-2 text-slate-400"></i> Change Password
+                        </a>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <button onclick="logout()" class="w-full text-left block px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 transition">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTAINER -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+            
+            <!-- SEARCH & CONTROLS -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Search username, employee ID, name..." 
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end text-xs text-slate-500 font-medium">
+                    <div class="flex items-center space-x-2">
+                        <span>Show:</span>
+                        <select id="rows-per-page" onchange="changeRowsPerPage()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 font-semibold">
+                            <option value="10" selected>10 rows</option>
+                            <option value="25">25 rows</option>
+                            <option value="50">50 rows</option>
+                            <option value="100">100 rows</option>
+                        </select>
+                    </div>
+                    <div>
+                        Total Portal Users: <span id="users-count" class="font-bold text-slate-800">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3.5">Employee ID</th>
+                                <th class="p-3.5">Full Name</th>
+                                <th class="p-3.5">Username</th>
+                                <th class="p-3.5">Password</th>
+                                <th class="p-3.5">Role</th>
+                                <th class="p-3.5">Account Status</th>
+                                <th class="p-3.5 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="7" class="p-6 text-center text-slate-400">Loading portal users...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PAGINATION -->
+                <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between text-xs text-slate-600">
+                    <div id="pagination-info">Showing 0 to 0 of 0 entries</div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="prevPage()" id="prev-btn" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+                        </button>
+                        <span id="page-indicator" class="font-bold px-2 text-slate-800">1 / 1</span>
+                        <button onclick="nextPage()" id="next-btn" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            Next <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= UNLOCK MODAL ================= -->
+    <div id="unlock-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="flex justify-between items-center bg-slate-900 text-white px-6 py-4">
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-lock-open mr-2 text-emerald-400"></i> Unlock User Account</h3>
+                <button onclick="closeUnlockModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="unlock-form" onsubmit="handleUnlockSubmit(event)" class="p-6 space-y-4 text-xs">
+                <input type="hidden" id="target_username">
+                
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 space-y-1">
+                    <p class="font-semibold"><i class="fa-solid fa-shield-halved mr-1"></i> Secondary Admin Authorization Required:</p>
+                    <p class="text-[11px] text-amber-700">Unlocking an account generates a secure 12-character temporary password and requires credentials from an <strong>IT-Admin</strong> or <strong>HR-Admin</strong> account.</p>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Target Account:</label>
+                    <input type="text" id="display_target_username" disabled class="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg font-mono font-bold text-slate-700">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Admin Username *</label>
+                    <input type="text" id="admin_auth_username" required placeholder="Enter admin username..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Admin Password *</label>
+                    <input type="password" id="admin_auth_password" required placeholder="Enter admin password..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeUnlockModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700">Verify & Unlock Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GLOBAL AUTH SYNC SCRIPT -->
+    <script src="auth-sync.js"></script>
+
+    <!-- CLIENT SCRIPT -->
+    <script>
+        let allUsers = [];
+        let currentPage = 1;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchUsersData();
+        });
+
+        function logout() {
+            localStorage.removeItem('portal_users');
+            localStorage.removeItem('userData');
+            window.location.href = "index.html";
+        }
+
+        async function fetchUsersData() {
+            try {
+                const response = await fetch('/api/portal_users');
+                const result = await response.json();
+
+                if (result.success) {
+                    allUsers = result.data;
+                    updateTable();
+                } else {
+                    document.getElementById('users-table-body').innerHTML = `<tr><td colspan="7" class="p-6 text-center text-rose-500">Failed to load portal users.</td></tr>`;
+                }
+            } catch (err) {
+                console.error('Fetch error:', err);
+                document.getElementById('users-table-body').innerHTML = `<tr><td colspan="7" class="p-6 text-center text-rose-500">Unable to reach backend server.</td></tr>`;
+            }
+        }
+
+        function getFilteredUsers() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            return allUsers.filter(item => 
+                (item.employee_id && item.employee_id.toLowerCase().includes(query)) ||
+                ((item.employee_lastname || '') + ', ' + (item.employee_firstname || '')).toLowerCase().includes(query) ||
+                (item.username && item.username.toLowerCase().includes(query)) ||
+                (item.role && item.role.toLowerCase().includes(query))
+            );
+        }
+
+        function togglePasswordVisibility(username, actualPassword) {
+            const pwdSpan = document.getElementById(`pwd-${username}`);
+            const eyeIcon = document.getElementById(`eye-${username}`);
+            
+            if (pwdSpan.textContent.includes('••••')) {
+                pwdSpan.textContent = actualPassword || 'N/A';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                pwdSpan.textContent = '••••••••••••';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        function updateTable() {
+            const filtered = getFilteredUsers();
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value) || 10;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageData = filtered.slice(startIndex, endIndex);
+
+            document.getElementById('users-count').textContent = allUsers.length;
+
+            const tbody = document.getElementById('users-table-body');
+            if (pageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No portal users found.</td></tr>`;
+            } else {
+                tbody.innerHTML = pageData.map(item => {
+                    // Full Name format: employee_lastname + ', ' + employee_firstname + employee_middlename
+                    let formattedName = 'N/A';
+                    if (item.employee_lastname && item.employee_firstname) {
+                        const middleNameStr = item.employee_middlename ? ` ${item.employee_middlename}` : '';
+                        formattedName = `${item.employee_lastname}, ${item.employee_firstname}${middleNameStr}`;
+                    } else if (item.name) {
+                        formattedName = item.name;
+                    }
+
+                    // Status Badge
+                    let statusBadge = 'bg-emerald-100 text-emerald-700';
+                    let statusText = 'Active';
+                    const failedAttempts = item.failed_attempts || 0;
+                    const isLocked = item.is_locked || failedAttempts >= 3 || item.status === 'Blocked';
+
+                    if (isLocked) {
+                        statusBadge = 'bg-rose-100 text-rose-700';
+                        statusText = 'Locked (3+ Failed)';
+                    }
+
+                    const safePassword = item.password_hash || '';
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-3.5 font-mono font-bold text-blue-600">${item.employee_id || 'N/A'}</td>
+                            <td class="p-3.5 font-semibold text-slate-900">${formattedName}</td>
+                            <td class="p-3.5 font-mono font-medium text-indigo-600">${item.username || 'N/A'}</td>
+                            <td class="p-3.5 font-mono">
+                                <div class="flex items-center space-x-2">
+                                    <span id="pwd-${item.username}" class="text-slate-500">••••••••••••</span>
+                                    <button type="button" onclick="togglePasswordVisibility('${item.username}', '${safePassword.replace(/'/g, "\\'")}')" class="text-slate-400 hover:text-slate-700 transition" title="Toggle Password">
+                                        <i id="eye-${item.username}" class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">${item.role || 'User'}</span></td>
+                            <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${statusBadge}">${statusText}</span></td>
+                            <td class="p-3.5 text-center">
+                                ${isLocked ? `
+                                    <button onclick="openUnlockModal('${item.username}')" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-2.5 py-1 rounded text-[11px] font-medium transition">
+                                        <i class="fa-solid fa-lock-open mr-1"></i> Unlock
+                                    </button>
+                                ` : `
+                                    <span class="text-slate-400 text-[11px] italic">Normal</span>
+                                `}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            const startEntry = filtered.length > 0 ? startIndex + 1 : 0;
+            const endEntry = Math.min(endIndex, filtered.length);
+            document.getElementById('pagination-info').textContent = `Showing ${startEntry} to ${endEntry} of ${filtered.length} entries`;
+            document.getElementById('page-indicator').textContent = `${currentPage} / ${totalPages}`;
+
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function handleSearch() {
+            currentPage = 1;
+            updateTable();
+        }
+
+        function changeRowsPerPage() {
+            currentPage = 1;
+            updateTable();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable();
+            }
+        }
+
+        function nextPage() {
+            const filtered = getFilteredUsers();
+            const rowsPerPage = parseInt(document.getElementById('rows-per-page').value) || 10;
+            const totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTable();
+            }
+        }
+
+        function openUnlockModal(username) {
+            document.getElementById('target_username').value = username;
+            document.getElementById('display_target_username').value = username;
+            document.getElementById('admin_auth_username').value = '';
+            document.getElementById('admin_auth_password').value = '';
+
+            const modal = document.getElementById('unlock-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeUnlockModal() {
+            const modal = document.getElementById('unlock-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function handleUnlockSubmit(event) {
+            event.preventDefault();
+
+            const targetUsername = document.getElementById('target_username').value;
+            const adminUser = document.getElementById('admin_auth_username').value.trim();
+            const adminPass = document.getElementById('admin_auth_password').value;
+
+            try {
+                // 1. Verify Admin Credentials & Role (must be IT-Admin or HR-Admin)
+                const authCheck = await fetch('/api/verify_admin_password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: adminUser, password: adminPass })
+                });
+                const authRes = await authCheck.json();
+
+                if (!authRes.success) {
+                    alert('Invalid admin credentials or unauthorized account. Verification failed.');
+                    return;
+                }
+
+                const adminRole = authRes.user ? authRes.user.role : '';
+                if (adminRole !== 'IT-Admin' && adminRole !== 'HR-Admin') {
+                    alert('Access Denied: Only IT-Admin or HR-Admin accounts can authorize an account unlock.');
+                    return;
+                }
+
+                // 2. Perform Unlock Request
+                const unlockRes = await fetch(`/api/portal_users/unlock`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: targetUsername })
+                });
+                const unlockResult = await unlockRes.json();
+
+                if (unlockRes.ok && unlockResult.success) {
+                    closeUnlockModal();
+                    fetchUsersData();
+                    const tempPassMsg = unlockResult.tempPassword ? `\n\nGenerated Temporary Password: ${unlockResult.tempPassword}\n(Please provide this securely to the employee)` : '';
+                    alert(`Account "${targetUsername}" has been successfully unlocked.${tempPassMsg}`);
+                } else {
+                    alert(unlockResult.message || 'Failed to unlock account.');
+                }
+            } catch (err) {
+                console.error('Error unlocking account:', err);
+                alert('Server connection error during account unlock.');
+            }
+        }
+
+        window.handleSearch = handleSearch;
+        window.changeRowsPerPage = changeRowsPerPage;
+        window.prevPage = prevPage;
+        window.nextPage = nextPage;
+        window.togglePasswordVisibility = togglePasswordVisibility;
+        window.openUnlockModal = openUnlockModal;
+        window.closeUnlockModal = closeUnlockModal;
+        window.handleUnlockSubmit = handleUnlockSubmit;
+        window.logout = logout;
+    </script>
+</body>
+</html>
