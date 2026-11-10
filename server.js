@@ -768,6 +768,22 @@ app.get('/api/asset_borrowing', async (req, res) => {
 // IT SUPPORT TICKETS ROUTES
 // ==========================================
 
+app.get('/api/support_tickets', async (req, res) => {
+    try {
+        const query = `
+            SELECT *, 
+                   EXTRACT(DAY FROM (COALESCE(date_resolved::timestamp, CURRENT_TIMESTAMP) - date::timestamp))::int AS days_open
+            FROM it_support_tickets 
+            ORDER BY ticket_id DESC;
+        `;
+        const result = await pool.query(query);
+        res.json({ success: true, data: result.rows });
+    } catch (err) {
+        console.error('Error fetching support tickets:', err.message);
+        res.status(500).json({ success: false, message: 'Server database error: ' + err.message });
+    }
+});
+
 app.post('/api/support_tickets', async (req, res) => {
     const {
         employee_id, employee_firstname, employee_middlename, employee_lastname,
