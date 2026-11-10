@@ -593,7 +593,7 @@ app.post('/api/provisioning_roster', async (req, res) => {
     const existingRoster = await client.query('SELECT * FROM provisioning_roster WHERE employee_id = $1', [employee_id]);
 
     const cleanRole = String(role || 'User').trim();
-    const isApprover = cleanRole === 'IT-Admin' || cleanRole === 'HR-Admin';
+    const isApprover = cleanRole === 'IT-Admin' || cleanRole === 'HR-Admin' || cleanRole === 'QC-Admin' || cleanRole === 'Admin';
 
     if (existingRoster.rows.length > 0) {
       // ---> UPDATE EXISTING EMPLOYEE RECORD <---
