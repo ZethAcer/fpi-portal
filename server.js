@@ -855,6 +855,57 @@ app.post('/api/support_tickets', async (req, res) => {
     }
 });
 
+app.put('/api/support_tickets/:id', async (req, res) => {
+    const { id } = req.params;
+    const {
+        issue_type, priority, status, date_resolved, assigned_to, task_description, remarks
+    } = req.body;
+
+    try {
+        const query = `
+            UPDATE it_support_tickets 
+            SET issue_type = $1, priority = $2, status = $3, date_resolved = $4, 
+                assigned_to = $5, task_description = $6, remarks = $7
+            WHERE ticket_id = $8
+            RETURNING *;
+        `;
+        const values = [
+            issue_type,
+            priority,
+            status,
+            date_resolved || null,
+            assigned_to || null,
+            task_description,
+            remarks || null,
+            id
+        ];
+
+        const result = await pool.query(query, values);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Support ticket not found.' });
+        }
+
+        res.json({ success: true, message: 'Support ticket updated successfully', data: result.rows[0] });
+    } catch (err) {
+        console.error('Error updating support ticket:', err.message);
+        res.status(500).json({ success: false, message: 'Server database error: ' + err.message });
+    }
+});
+
+app.delete('/api/support_tickets/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('DELETE FROM it_support_tickets WHERE ticket_id = $1 OR id::text = $1 RETURNING *', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Support ticket not found.' });
+        }
+        res.json({ success: true, message: 'Support ticket deleted successfully.' });
+    } catch (err) {
+        console.error('Error deleting support ticket:', err.message);
+        res.status(500).json({ success: false, message: 'Server database error' });
+    }
+});
+
 // ==========================================
 // STORAGE & REPOSITORY ROUTES
 // ==========================================
