@@ -768,22 +768,6 @@ app.get('/api/asset_borrowing', async (req, res) => {
 // IT SUPPORT TICKETS ROUTES
 // ==========================================
 
-app.get('/api/support_tickets', async (req, res) => {
-    try {
-        const query = `
-            SELECT *, 
-                   EXTRACT(DAY FROM (COALESCE(date_resolved, CURRENT_TIMESTAMP) - date))::int AS days_open
-            FROM it_support_tickets 
-            ORDER BY ticket_id DESC;
-        `;
-        const result = await pool.query(query);
-        res.json({ success: true, data: result.rows });
-    } catch (err) {
-        console.error('Error fetching support tickets:', err);
-        res.status(500).json({ success: false, message: 'Server error while fetching support tickets.' });
-    }
-});
-
 app.post('/api/support_tickets', async (req, res) => {
     const {
         employee_id, employee_firstname, employee_middlename, employee_lastname,
@@ -791,17 +775,21 @@ app.post('/api/support_tickets', async (req, res) => {
     } = req.body;
 
     try {
-        const currentYear = new Date().getFullYear();
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+        const yearMonthPrefix = `${currentYear}${currentMonth}`;
+
         const maxQuery = await pool.query(
             `SELECT MAX(CAST(SUBSTRING(ticket_id FROM '[0-9]+$') AS INTEGER)) as max_num 
              FROM it_support_tickets 
              WHERE ticket_id LIKE $1`,
-            [`TKT-${currentYear}-%`]
+            [`TKT-${yearMonthPrefix}-%`]
         );
 
         const nextSeq = (maxQuery.rows[0].max_num || 0) + 1;
-        const ticket_id = `TKT-${currentYear}-${String(nextSeq).padStart(4, '0')}`;
-        const currentDate = new Date().toISOString().split('T')[0];
+        const ticket_id = `TKT-${yearMonthPrefix}-${String(nextSeq).padStart(4, '0')}`;
+        const currentDate = now.toISOString().split('T')[0];
 
         const query = `
             INSERT INTO it_support_tickets 
