@@ -539,45 +539,6 @@ app.put('/api/access_audit_logs/:id', async (req, res) => {
   }
 });
 
-// ==========================================
-// PROVISIONING ROSTER & USER REGISTRATION ROUTES
-// ==========================================
-
-app.get('/api/provisioning_roster', async (req, res) => {
-  try {
-    const query = `
-      SELECT r.id, r.employee_id, r.employee_firstname, r.employee_middlename, r.employee_lastname,
-             r.department, r.job_title, r.manager_name, r.employee_status, r.effective_date, r.created_at,
-             u.username, u.role
-      FROM provisioning_roster r
-      LEFT JOIN portal_users u ON r.employee_id = u.employee_id
-      ORDER BY r.employee_id DESC;
-    `;
-    const result = await pool.query(query);
-    res.json({ success: true, data: result.rows });
-  } catch (err) {
-    console.error('Error fetching provisioning roster:', err.message);
-    res.status(500).json({ success: false, message: 'Server database error' });
-  }
-});
-
-app.get('/api/provisioning_roster/lookup/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const query = 'SELECT * FROM provisioning_roster WHERE employee_id::text = $1 LIMIT 1;';
-        const result = await pool.query(query, [id]);
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Employee not found in roster.' });
-        }
-
-        res.json({ success: true, data: result.rows[0] });
-    } catch (err) {
-        console.error('Error looking up roster employee:', err.message);
-        res.status(500).json({ success: false, message: 'Server database error: ' + err.message });
-    }
-});
-
 app.post('/api/provisioning_roster', async (req, res) => {
   const {
     employee_id, employee_firstname, employee_middlename, employee_lastname,
@@ -591,6 +552,9 @@ app.post('/api/provisioning_roster', async (req, res) => {
 
     // 1. Check if employee already exists in provisioning_roster (Supports Edit/Upsert)
     const existingRoster = await client.query('SELECT * FROM provisioning_roster WHERE employee_id = $1', [employee_id]);
+
+    const cleanRole = String(role || 'User').trim();
+    const isApprover = cleanRole === 'IT-Admin' || cleanRole === 'HR-Admin';
 
     if (existingRoster.rows.length > 0) {
       // ---> UPDATE EXISTING EMPLOYEE RECORD <---
@@ -607,11 +571,11 @@ app.post('/api/provisioning_roster', async (req, res) => {
       ];
       const rosterResult = await client.query(updateRosterQuery, updateValues);
 
-      // Also update portal_users role & names if they exist
+      // Also update portal_users role, names, and is_approver flag
       if (role) {
         await client.query(
-          'UPDATE portal_users SET role = $1, employee_firstname = $2, employee_lastname = $3 WHERE employee_id = $4',
-          [role, employee_firstname, employee_lastname, employee_id]
+          'UPDATE portal_users SET role = $1, employee_firstname = $2, employee_lastname = $3, is_approver = $5 WHERE employee_id = $4',
+          [cleanRole, employee_firstname, employee_lastname, employee_id, isApprover]
         );
       }
 
@@ -661,13 +625,13 @@ app.post('/api/provisioning_roster', async (req, res) => {
 
     const userQuery = `
       INSERT INTO portal_users 
-        (employee_id, username, password_hash, employee_firstname, employee_lastname, role, status, failed_attempts, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 0, CURRENT_TIMESTAMP)
+        (employee_id, username, password_hash, employee_firstname, employee_lastname, role, is_approver, status, failed_attempts, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, CURRENT_TIMESTAMP)
       RETURNING *;
     `;
     const userValues = [
       employee_id, generatedUsername, temp_password, employee_firstname, employee_lastname, 
-      role || 'User', employee_status === 'Active' ? 'Active' : 'Pending'
+      cleanRole, isApprover, employee_status === 'Active' ? 'Active' : 'Pending'
     ];
     await client.query(userQuery, userValues);
 
@@ -711,7 +675,7 @@ app.post('/api/provisioning_roster', async (req, res) => {
       manager_name || 'HR / IT Management',
       generatedUsername,
       'FPI Portal',
-      role || 'User',
+      cleanRole,
       'Batino Branch',
       'Email Approval',
       'Approved',
