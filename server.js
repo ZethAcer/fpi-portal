@@ -784,6 +784,56 @@ app.get('/api/support_tickets', async (req, res) => {
     }
 });
 
+app.post('/api/support_tickets', async (req, res) => {
+    const {
+        employee_id, employee_firstname, employee_middlename, employee_lastname,
+        department, issue_type, task_description, priority, assigned_to, remarks
+    } = req.body;
+
+    try {
+        const currentYear = new Date().getFullYear();
+        const maxQuery = await pool.query(
+            `SELECT MAX(CAST(SUBSTRING(ticket_id FROM '[0-9]+$') AS INTEGER)) as max_num 
+             FROM it_support_tickets 
+             WHERE ticket_id LIKE $1`,
+            [`TKT-${currentYear}-%`]
+        );
+
+        const nextSeq = (maxQuery.rows[0].max_num || 0) + 1;
+        const ticket_id = `TKT-${currentYear}-${String(nextSeq).padStart(4, '0')}`;
+        const currentDate = new Date().toISOString().split('T')[0];
+
+        const query = `
+            INSERT INTO it_support_tickets 
+                (ticket_id, date, employee_id, employee_firstname, employee_middlename, employee_lastname,
+                 department, issue_type, priority, status, assigned_to, task_description, remarks)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            RETURNING *;
+        `;
+        const values = [
+            ticket_id,
+            currentDate,
+            employee_id || null,
+            employee_firstname,
+            employee_middlename || null,
+            employee_lastname,
+            department,
+            issue_type || 'Hardware',
+            priority || 'Medium',
+            'Open',
+            assigned_to || null,
+            task_description,
+            remarks || null
+        ];
+
+        const result = await pool.query(query, values);
+        res.json({ success: true, message: 'Support ticket created successfully.', data: result.rows[0] });
+    } catch (err) {
+        console.error('Error creating support ticket:', err.message);
+        res.status(500).json({ success: false, message: 'Server database error: ' + err.message });
+    }
+});
+
 // ==========================================
 // STORAGE & REPOSITORY ROUTES
 // ==========================================
