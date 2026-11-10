@@ -895,7 +895,7 @@ app.put('/api/support_tickets/:id', async (req, res) => {
 app.delete('/api/support_tickets/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await pool.query('DELETE FROM it_support_tickets WHERE ticket_id = $1 OR id::text = $1 RETURNING *', [id]);
+        const result = await pool.query('DELETE FROM it_support_tickets WHERE ticket_id = $1 RETURNING *', [id]);
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Support ticket not found.' });
         }
