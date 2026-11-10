@@ -5,7 +5,7 @@ const path = require('path');
 const session = require('express-session');
 
 // 1. Load environment configuration file
-require('dotenv').config({ path: './test.env' });
+require('dotenv').config({ path: './.env' });
 
 // 2. Initialize Express app and set port to 80 for network-wide access
 const app = express();
@@ -27,14 +27,15 @@ app.use(express.static(path.join(__dirname, 'Public')));
 
 // 3. PostgreSQL Connection Pool
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'fpi_it_portal',
+  port: process.env.DB_PORT || 5432
 });
 
 pool.on('connect', () => {
-  console.log('✅ Connected to Neon cloud PostgreSQL database');
+  console.log('✅ Connected to PostgreSQL database (fpi_it_portal)');
 });
 
 // ==========================================
@@ -537,6 +538,45 @@ app.put('/api/access_audit_logs/:id', async (req, res) => {
     console.error('Error updating audit log:', err.message);
     res.status(500).json({ success: false, message: 'Server database error: ' + err.message });
   }
+});
+
+// ==========================================
+// PROVISIONING ROSTER & USER REGISTRATION ROUTES
+// ==========================================
+
+app.get('/api/provisioning_roster', async (req, res) => {
+  try {
+    const query = `
+      SELECT r.id, r.employee_id, r.employee_firstname, r.employee_middlename, r.employee_lastname,
+             r.department, r.job_title, r.manager_name, r.employee_status, r.effective_date, r.created_at,
+             u.username, u.role
+      FROM provisioning_roster r
+      LEFT JOIN portal_users u ON r.employee_id = u.employee_id
+      ORDER BY r.employee_id DESC;
+    `;
+    const result = await pool.query(query);
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error('Error fetching provisioning roster:', err.message);
+    res.status(500).json({ success: false, message: 'Server database error' });
+  }
+});
+
+app.get('/api/provisioning_roster/lookup/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const query = 'SELECT * FROM provisioning_roster WHERE employee_id::text = $1 LIMIT 1;';
+        const result = await pool.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Employee not found in roster.' });
+        }
+
+        res.json({ success: true, data: result.rows[0] });
+    } catch (err) {
+        console.error('Error looking up roster employee:', err.message);
+        res.status(500).json({ success: false, message: 'Server database error: ' + err.message });
+    }
 });
 
 app.post('/api/provisioning_roster', async (req, res) => {
