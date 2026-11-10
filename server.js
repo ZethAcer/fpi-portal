@@ -561,6 +561,23 @@ app.get('/api/provisioning_roster', async (req, res) => {
   }
 });
 
+app.get('/api/provisioning_roster/lookup/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const query = 'SELECT * FROM provisioning_roster WHERE employee_id::text = $1 LIMIT 1;';
+        const result = await pool.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Employee not found in roster.' });
+        }
+
+        res.json({ success: true, data: result.rows[0] });
+    } catch (err) {
+        console.error('Error looking up roster employee:', err.message);
+        res.status(500).json({ success: false, message: 'Server database error: ' + err.message });
+    }
+});
+
 app.post('/api/provisioning_roster', async (req, res) => {
   const {
     employee_id, employee_firstname, employee_middlename, employee_lastname,
