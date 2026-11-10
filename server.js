@@ -27,11 +27,10 @@ app.use(express.static(path.join(__dirname, 'Public')));
 
 // 3. PostgreSQL Connection Pool
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME || 'fpi_it_portal',
-  port: process.env.DB_PORT || 5432
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 pool.on('connect', () => {
