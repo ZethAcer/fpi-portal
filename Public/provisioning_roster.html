@@ -244,6 +244,8 @@
                             <option value="HR">HR</option>
                             <option value="IT-Admin">IT-Admin</option>
                             <option value="HR-Admin">HR-Admin</option>
+                            <option value="HR-Admin">QC-Admin</option>
+                            <option value="HR-Admin">Admin</option>
                         </select>
                     </div>
                 </div>
@@ -293,7 +295,7 @@
                 const adminBox = document.getElementById('admin-auth-container');
                 const roleLabel = document.getElementById('selected-admin-role-label');
                 const val = e.target.value;
-                if (val === 'IT-Admin' || val === 'HR-Admin') {
+                if (val.includes('Admin')) {
                     roleLabel.textContent = val;
                     adminBox.classList.remove('hidden');
                 } else {
@@ -493,7 +495,7 @@
                 // Trigger check if it's already an admin role upon opening edit modal
                 const adminBox = document.getElementById('admin-auth-container');
                 const roleLabel = document.getElementById('selected-admin-role-label');
-                if (record.role === 'IT-Admin' || record.role === 'HR-Admin') {
+                if (record.role && record.role.includes('Admin')) {
                     roleLabel.textContent = record.role;
                     adminBox.classList.remove('hidden');
                 } else {
@@ -535,7 +537,7 @@
             const recordId = document.getElementById('record_id').value;
 
             // Enforce admin password confirmation for privileged roles on both Add and Edit
-            if (role === 'IT-Admin' || role === 'HR-Admin') {
+            if (role.includes('Admin')) {
                 const adminUser = document.getElementById('admin_auth_username').value.trim();
                 const adminPass = document.getElementById('admin_auth_password').value;
                 if (!adminUser || !adminPass) {
