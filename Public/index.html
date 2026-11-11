@@ -87,11 +87,11 @@
 
                 if (response.ok && result.success) {
                     const role = result.user.role;
+                    const allowedRoles = ['IT', 'HR', 'IT-Admin', 'HR-Admin'];
 
-                    // Enforce Rule: 'User' cannot log in to the portal and has no privileges
-                    if (role === 'User') {
+                    if (!allowedRoles.includes(role)) {
                         alertBox.className = "mb-4 p-3 rounded text-sm font-medium text-center bg-red-100 text-red-700";
-                        alertBox.textContent = "You don't have permission to Access this Page";
+                        alertBox.textContent = "You don't have permission to access this portal.";
                         alertBox.classList.remove('hidden');
                         return;
                     }
