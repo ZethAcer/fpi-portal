@@ -102,6 +102,14 @@ app.post('/api/login', async (req, res) => {
       }
     }
 
+    const allowedRoles = ['IT', 'HR', 'IT-Admin', 'HR-Admin'];
+    if (!allowedRoles.includes(user.role)) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Access Denied: Your assigned role is not authorized to access the IT Portal.' 
+      });
+    }
+
     await pool.query(
       'UPDATE portal_users SET failed_attempts = 0 WHERE username = $1',
       [targetUsername]
